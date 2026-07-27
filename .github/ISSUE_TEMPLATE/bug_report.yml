@@ -1,0 +1,129 @@
+name: Bug report
+description: Something is broken or behaving unexpectedly in the integration.
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug. Please fill out **every** field — bug reports without versions or logs almost always get closed without a fix.
+
+        **First, check whether it's actually Afero's cloud, not this integration:** if the official Hubspace app is also slow/broken/unable to control the same device right now, that's an upstream Afero outage, not a bug here. This integration surfaces that as `unavailable`, not as a crash — see the How It Works section of the README.
+
+        ### How to capture the data this form asks for
+
+        **Integration version**
+        Settings → Devices & Services → Hubspace (3-dot menu) → *About this integration* → version. Or check `manifest.json` in the installed `custom_components/hubspace/`.
+
+        **Home Assistant version**
+        Settings → About → Home Assistant Core. Include the install type (Container / OS / Supervised / Core).
+
+        **Debug logs**
+        Add this block to `configuration.yaml`, restart, reproduce the issue, then grab logs from Settings → System → Logs (or `home-assistant.log`):
+
+        ```yaml
+        logger:
+          default: warning
+          logs:
+            custom_components.hubspace: debug
+        ```
+
+        Redact your email address and any tokens before pasting.
+
+  - type: input
+    id: integration_version
+    attributes:
+      label: Integration version
+      placeholder: "e.g. 2026.7.0-beta"
+    validations:
+      required: true
+
+  - type: input
+    id: ha_version
+    attributes:
+      label: Home Assistant version
+      placeholder: "e.g. 2026.7.1 (Container)"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: install_method
+    attributes:
+      label: How did you install the integration?
+      options:
+        - HACS (Custom repository)
+        - Manual copy to custom_components/
+        - Other (please specify in description)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: device_class
+    attributes:
+      label: Device type
+      description: Which kind of device is affected?
+      options:
+        - Light (single zone)
+        - Light (multi-zone / dual-channel)
+        - Fan
+        - Switch / outlet
+        - Lock
+        - Valve / water timer
+        - Thermostat
+        - Portable AC
+        - Security system / sensor / keypad
+        - Generic sensor or number/select entity
+        - Not device-specific (auth, setup, cloud connectivity)
+    validations:
+      required: true
+
+  - type: input
+    id: device_model
+    attributes:
+      label: Device model
+      description: From the Hubspace app, device settings, or the HA device page's model field.
+      placeholder: "e.g. 12A19060WRGBWH2"
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Describe the bug. What did you expect, what actually happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Add the integration via UI
+        2. Toggle the light from off -> on
+        3. Observe the entity stays "off" for a few seconds then flickers
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs
+      description: |
+        Paste the **debug-level** log output for the time window of the bug.
+        Redact your email address and any tokens/refresh tokens. The form auto-wraps in a code block.
+      render: shell
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Pre-submission checklist
+      options:
+        - label: I have searched existing issues and confirmed this is not a duplicate.
+          required: true
+        - label: I have redacted my email address and any tokens from logs.
+          required: true
+        - label: I am running the latest released version of this integration.
+          required: true
+        - label: I confirmed the official Hubspace app can control this device right now (i.e. this isn't an Afero cloud outage).
+          required: true

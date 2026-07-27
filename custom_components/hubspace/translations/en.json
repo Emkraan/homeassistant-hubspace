@@ -1,0 +1,51 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Hubspace",
+        "description": "Sign in with your Hubspace account credentials.",
+        "data": {
+          "username": "Email address",
+          "password": "Password"
+        }
+      },
+      "otp": {
+        "title": "Two-factor code",
+        "description": "Enter the one-time code sent to your Hubspace account.",
+        "data": {
+          "otp_code": "Code"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Re-authenticate",
+        "description": "Your stored Hubspace password no longer works. Sign in again for {username}.",
+        "data": {
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Username or password is incorrect.",
+      "invalid_otp": "The code was incorrect. Enter it again.",
+      "cannot_connect": "Could not reach the Hubspace cloud.",
+      "unknown": "Unexpected error. Check the logs for details."
+    },
+    "abort": {
+      "already_configured": "This Hubspace account is already configured.",
+      "reauth_successful": "Re-authentication successful."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Hubspace options",
+        "data": {
+          "polling_interval": "State polling interval",
+          "discovery_interval": "Device discovery interval",
+          "tolerate_stale_data": "Keep last-known data during brief cloud outages",
+          "stale_grace_minutes": "Stale-data grace period"
+        }
+      }
+    }
+  }
+}

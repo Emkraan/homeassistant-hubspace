@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or discussion
+    url: https://github.com/Emkraan/homeassistant-hubspace/discussions
+    about: For general questions, setup help, or feature brainstorming, please open a Discussion instead of an Issue.
+  - name: Hubspace / Afero cloud outage
+    url: https://github.com/Expl0dingBanana/aioafero/issues
+    about: If the Hubspace app itself is also broken or slow, the issue is very likely on Afero's cloud, not this integration.
