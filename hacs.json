@@ -1,6 +1,5 @@
 {
   "name": "Hubspace",
   "render_readme": true,
-  "homeassistant": "2025.1.0",
-  "changelog": "https://raw.githubusercontent.com/Emkraan/homeassistant-hubspace/main/CHANGELOG.md"
+  "homeassistant": "2025.1.0"
 }
