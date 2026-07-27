@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026.7.1-beta (2026-07-27)
+
+Re-cut as a fresh tag/release. The `2026.7.0-beta` tag was deleted and
+recreated pointing at a different commit after a same-day `hacs.json` fix —
+HACS's own release-indexing pipeline got confused by the tag move and cached
+a stale ref, causing installs to 404. No functional changes from
+`2026.7.0-beta` beyond this version bump; if you have `2026.7.0-beta`
+tracked in HACS, remove the repository and re-add it fresh rather than
+updating in place.
+
 ## 2026.7.0-beta (2026-07-27)
 
 Initial release. A from-scratch Home Assistant integration for Hubspace
