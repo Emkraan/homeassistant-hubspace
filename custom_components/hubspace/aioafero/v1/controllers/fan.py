@@ -1,10 +1,10 @@
 """Controller holding and managing Afero IoT resources of type `fan`."""
 
-from aioafero.device import AferoDevice, get_function_from_device
-from aioafero.util import ordered_list_item_to_percentage
-from aioafero.v1.models import features
-from aioafero.v1.models.fan import Fan, FanPut
-from aioafero.v1.models.resource import DeviceInformation, ResourceTypes
+from ...device import AferoDevice, get_function_from_device
+from ...util import ordered_list_item_to_percentage
+from ..models import features
+from ..models.fan import Fan, FanPut
+from ..models.resource import DeviceInformation, ResourceTypes
 
 from .base import AferoBinarySensor, AferoSensor, BaseResourcesController
 

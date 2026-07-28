@@ -11,7 +11,7 @@ from dataclasses import asdict, dataclass, field, fields
 import logging
 from typing import Any, TypeVar
 
-from aioafero.util import normalize_afero_last_update_time_ms
+from .util import normalize_afero_last_update_time_ms
 
 logger = logging.getLogger(__name__)
 

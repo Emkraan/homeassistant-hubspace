@@ -31,14 +31,14 @@ import aiohttp
 from aiohttp import web_exceptions
 from securelogging import LogRedactorMessage, add_secret
 
-from aioafero.device import AferoDevice, AferoResource, AferoState
-from aioafero.errors import (
+from ..device import AferoDevice, AferoResource, AferoState
+from ..errors import (
     AferoError,
     DeviceNotFound,
     ExceededMaximumRetries,
     InvalidAuth,
 )
-from aioafero.types import TemperatureUnit
+from ..types import TemperatureUnit
 
 from . import models, v1_const
 from .auth import AferoAuth, TokenData, passthrough

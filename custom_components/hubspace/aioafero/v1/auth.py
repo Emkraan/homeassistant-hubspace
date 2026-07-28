@@ -18,7 +18,7 @@ from aiohttp import ClientResponseError, ContentTypeError
 from bs4 import BeautifulSoup
 from securelogging import LogRedactorMessage, add_secret, remove_secret
 
-from aioafero.errors import InvalidAuth, InvalidOTP, InvalidResponse, OTPRequired
+from ..errors import InvalidAuth, InvalidOTP, InvalidResponse, OTPRequired
 
 from . import v1_const
 

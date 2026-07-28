@@ -42,6 +42,36 @@ the change site, so a future upstream version bump is a reviewable diff.
   Added the same consecutive-failure tracking and `DISCONNECTED`/
   `RECONNECTED` emission to the state-poll loop.
 
+- **All files** (2026-07-28, critical): every internal cross-module import
+  in this vendored tree used upstream's original **absolute** form
+  (`from aioafero.device import ...`, `from aioafero.v1.models import ...`,
+  etc.), which only resolves correctly when `aioafero` is genuinely
+  installed as its own top-level package — never true here, since it's
+  vendored under `custom_components.hubspace.aioafero`. Two failure modes,
+  both confirmed live: (a) on any environment with **no** leftover
+  `aioafero` PyPI package already installed, every one of these imports
+  raises `ModuleNotFoundError: No module named 'aioafero'` and the whole
+  integration fails to load; (b) on an environment that happens to have a
+  **real, unpatched** `aioafero` installed already (e.g. a leftover
+  dependency from the community `jdeath/Hubspace-Homeassistant` integration
+  this repo replaces), those absolute imports silently resolve to that
+  *external, unpatched* copy instead of this vendored one — the HA-side
+  `HubspaceCoordinator` in the parent package still imports `EventType` etc.
+  via its own correct relative import into *this* vendored tree, so the two
+  ends of the same event stream ended up holding two distinct `EventType`
+  enum classes; every `event_type == EventType.X` comparison in the
+  coordinator silently evaluated `False`, `_last_seen` was never populated,
+  and every entity showed `unavailable` forever despite the devices being
+  online and controllable in the official Hubspace app. Rewrote every
+  `from aioafero...` import in this tree to the correctly-scoped relative
+  form (`from .`/`from ..`/`from ...` depending on file depth) so the
+  vendored package is fully self-contained regardless of what else is
+  installed in the Python environment. Verified by importing every module
+  under a bare `custom_components.hubspace` package layout with only the
+  three real runtime dependencies (`aiohttp`, `beautifulsoup4`,
+  `securelogging`) installed — no other tests here caught this because
+  `py_compile`/`ruff` check syntax, not whether imports actually resolve.
+
 ## Integration-support addition (not a reliability patch)
 
 - **`v1/__init__.py`**: added `AferoBridgeV1.controllers_by_name`, a small

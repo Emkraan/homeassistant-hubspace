@@ -1,10 +1,10 @@
 """Controller holding and managing Afero IoT resources of type `switch`."""
 
-from aioafero import errors
-from aioafero.device import AferoDevice
-from aioafero.v1.models import features
-from aioafero.v1.models.resource import DeviceInformation, ResourceTypes
-from aioafero.v1.models.switch import Switch, SwitchPut
+from ... import errors
+from ...device import AferoDevice
+from ..models import features
+from ..models.resource import DeviceInformation, ResourceTypes
+from ..models.switch import Switch, SwitchPut
 
 from .base import AferoBinarySensor, AferoSensor, BaseResourcesController
 

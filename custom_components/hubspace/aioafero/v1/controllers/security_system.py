@@ -3,16 +3,16 @@
 import asyncio
 import copy
 
-from aioafero.device import (
+from ...device import (
     AferoCapability,
     AferoDevice,
     AferoState,
     get_function_from_device,
 )
-from aioafero.errors import DeviceNotFound, SecuritySystemError
-from aioafero.util import process_function
-from aioafero.v1.models import SecuritySystem, SecuritySystemPut, features
-from aioafero.v1.models.resource import DeviceInformation, ResourceTypes
+from ...errors import DeviceNotFound, SecuritySystemError
+from ...util import process_function
+from ..models import SecuritySystem, SecuritySystemPut, features
+from ..models.resource import DeviceInformation, ResourceTypes
 
 from .base import AferoBinarySensor, AferoSensor, BaseResourcesController, NumbersName
 from .event import CallbackResponse

@@ -12,14 +12,14 @@ from typing import TYPE_CHECKING, Any, NamedTuple, NotRequired, TypedDict
 from aiohttp.client_exceptions import ClientError
 from aiohttp.web_exceptions import HTTPForbidden, HTTPTooManyRequests
 
-from aioafero.device import AferoDevice, get_afero_device
-from aioafero.errors import InvalidAuth
-from aioafero.types import EventType
-from aioafero.v1.models import ResourceTypes
-from aioafero.v1.v1_const import VERSION_POLL_INTERVAL_SECONDS
+from ...device import AferoDevice, get_afero_device
+from ...errors import InvalidAuth
+from ...types import EventType
+from ..models import ResourceTypes
+from ..v1_const import VERSION_POLL_INTERVAL_SECONDS
 
 if TYPE_CHECKING:  # pragma: no cover
-    from aioafero.v1 import AferoBridgeV1
+    from .. import AferoBridgeV1
 
 
 class BackoffException(Exception):

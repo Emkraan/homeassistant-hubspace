@@ -1,8 +1,8 @@
 """Controller that holds top-level devices."""
 
-from aioafero.device import AferoDevice
-from aioafero.v1.models.device import Device
-from aioafero.v1.models.resource import DeviceInformation, ResourceTypes
+from ...device import AferoDevice
+from ..models.device import Device
+from ..models.resource import DeviceInformation, ResourceTypes
 
 from .base import AferoBinarySensor, AferoSensor, BaseResourcesController
 from .event import AferoEvent, EventType

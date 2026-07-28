@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass, field
 
-from aioafero.v1.models import features
+from . import features
 
 from .hvac_mixin import HVACMixin
 from .resource import ResourceTypes

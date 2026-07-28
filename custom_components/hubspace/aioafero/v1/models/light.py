@@ -3,7 +3,7 @@
 from dataclasses import dataclass, field
 import re
 
-from aioafero.v1.models import features
+from . import features
 
 from .resource import ResourceTypes
 from .standard_mixin import StandardMixin

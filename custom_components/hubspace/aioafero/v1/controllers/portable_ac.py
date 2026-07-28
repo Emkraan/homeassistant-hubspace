@@ -2,11 +2,11 @@
 
 import copy
 
-from aioafero.device import AferoDevice
-from aioafero.errors import DeviceNotFound
-from aioafero.v1.models import features
-from aioafero.v1.models.portable_ac import PortableAC, PortableACPut
-from aioafero.v1.models.resource import DeviceInformation, ResourceTypes
+from ...device import AferoDevice
+from ...errors import DeviceNotFound
+from ..models import features
+from ..models.portable_ac import PortableAC, PortableACPut
+from ..models.resource import DeviceInformation, ResourceTypes
 
 from .climate import ClimateController
 from .event import CallbackResponse

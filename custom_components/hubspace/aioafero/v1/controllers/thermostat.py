@@ -2,11 +2,11 @@
 
 import copy
 
-from aioafero.device import AferoDevice
-from aioafero.util import process_function
-from aioafero.v1.models import features
-from aioafero.v1.models.resource import DeviceInformation, ResourceTypes
-from aioafero.v1.models.thermostat import Thermostat, ThermostatPut
+from ...device import AferoDevice
+from ...util import process_function
+from ..models import features
+from ..models.resource import DeviceInformation, ResourceTypes
+from ..models.thermostat import Thermostat, ThermostatPut
 
 from .climate import ClimateController
 
