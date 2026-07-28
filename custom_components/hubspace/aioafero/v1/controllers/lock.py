@@ -1,9 +1,9 @@
 """Controller holding and managing Afero IoT resources of type `lock`."""
 
-from aioafero.device import AferoDevice
-from aioafero.v1.models import features
-from aioafero.v1.models.lock import Lock, LockPut
-from aioafero.v1.models.resource import DeviceInformation, ResourceTypes
+from ...device import AferoDevice
+from ..models import features
+from ..models.lock import Lock, LockPut
+from ..models.resource import DeviceInformation, ResourceTypes
 
 from .base import AferoBinarySensor, AferoSensor, BaseResourcesController
 

@@ -1,9 +1,9 @@
 """Controller holding and managing Afero IoT resources of type `security-system-keypad`."""
 
-from aioafero.device import AferoDevice
-from aioafero.errors import DeviceNotFound
-from aioafero.v1.models import SecuritySystemKeypad, SecuritySystemKeypadPut, features
-from aioafero.v1.models.resource import DeviceInformation, ResourceTypes
+from ...device import AferoDevice
+from ...errors import DeviceNotFound
+from ..models import SecuritySystemKeypad, SecuritySystemKeypadPut, features
+from ..models.resource import DeviceInformation, ResourceTypes
 
 from .base import AferoBinarySensor, BaseResourcesController
 

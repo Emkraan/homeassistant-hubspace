@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING, Any, NamedTuple
 
 import aiohttp
 
-from aioafero.device import (
+from ...device import (
     AferoDevice,
     AferoResource,
     AferoState,
@@ -18,18 +18,18 @@ from aioafero.device import (
     get_afero_device,
     merge_afero_states,
 )
-from aioafero.errors import DeviceNotFound, ExceededMaximumRetries
-from aioafero.types import TemperatureUnit
-from aioafero.util import get_afero_base_time_ms, process_function
-from aioafero.v1 import v1_const
-from aioafero.v1.models.features import NumbersFeature, SelectFeature
-from aioafero.v1.models.resource import ResourceTypes
-from aioafero.v1.models.sensor import AferoBinarySensor, AferoSensor
+from ...errors import DeviceNotFound, ExceededMaximumRetries
+from ...types import TemperatureUnit
+from ...util import get_afero_base_time_ms, process_function
+from .. import v1_const
+from ..models.features import NumbersFeature, SelectFeature
+from ..models.resource import ResourceTypes
+from ..models.sensor import AferoBinarySensor, AferoSensor
 
 from .event import AferoEvent, EventCallBackType, EventType
 
 if TYPE_CHECKING:  # pragma: no cover
-    from aioafero.v1 import AferoBridgeV1
+    from .. import AferoBridgeV1
 
 
 EventSubscriptionType = tuple[

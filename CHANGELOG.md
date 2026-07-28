@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026.7.2-beta (2026-07-28)
+
+**Critical fix: entities stuck permanently `unavailable`.** The vendored
+`aioafero` tree used upstream's original absolute imports
+(`from aioafero.xxx import ...`), which only work when `aioafero` is a real
+top-level package — never true here. On a clean install with no leftover
+`aioafero` PyPI package, this breaks the integration outright
+(`ModuleNotFoundError`). On an install with a leftover `aioafero` from the
+community integration this replaces, those imports silently resolved to
+that external, unpatched copy instead — splitting the event stream across
+two different `EventType` classes and permanently breaking every entity's
+`unavailable` check, even for devices confirmed online in the official
+Hubspace app. Rewrote every internal import in the vendored tree to be
+properly relative; see
+`custom_components/hubspace/aioafero/NOTICE.md` for the full explanation.
+
+**If you installed `2026.7.0-beta` or `2026.7.1-beta` and your devices show
+unavailable, update to this version — no need to remove/re-add in HACS,
+just install the update and restart Home Assistant.**
+
 ## 2026.7.1-beta (2026-07-27)
 
 Re-cut as a fresh tag/release. The `2026.7.0-beta` tag was deleted and

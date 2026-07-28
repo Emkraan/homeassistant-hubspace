@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 
-from aioafero.v1.models import features
+from . import features
 
 from .resource import ResourceTypes
 from .standard_mixin import StandardMixin

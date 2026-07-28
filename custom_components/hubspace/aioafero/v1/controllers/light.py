@@ -4,12 +4,12 @@ from contextlib import suppress
 import copy
 import logging
 
-from aioafero import device, errors
-from aioafero.device import AferoDevice, AferoState
-from aioafero.util import process_range
-from aioafero.v1.models import features
-from aioafero.v1.models.light import Light, LightPut
-from aioafero.v1.models.resource import DeviceInformation, ResourceTypes
+from ... import device, errors
+from ...device import AferoDevice, AferoState
+from ...util import process_range
+from ..models import features
+from ..models.light import Light, LightPut
+from ..models.resource import DeviceInformation, ResourceTypes
 
 from .base import AferoBinarySensor, AferoSensor, BaseResourcesController, NumbersName
 from .event import CallbackResponse

@@ -2,12 +2,12 @@
 
 import copy
 
-from aioafero.device import AferoDevice, get_function_from_device
-from aioafero.errors import DeviceNotFound
-from aioafero.v1.models import features
-from aioafero.v1.models.exhaust_fan import ExhaustFan, ExhaustFanPut
-from aioafero.v1.models.features import NumbersFeature, SelectFeature
-from aioafero.v1.models.resource import DeviceInformation, ResourceTypes
+from ...device import AferoDevice, get_function_from_device
+from ...errors import DeviceNotFound
+from ..models import features
+from ..models.exhaust_fan import ExhaustFan, ExhaustFanPut
+from ..models.features import NumbersFeature, SelectFeature
+from ..models.resource import DeviceInformation, ResourceTypes
 
 from .base import AferoBinarySensor, AferoSensor, BaseResourcesController, NumbersName
 from .event import CallbackResponse

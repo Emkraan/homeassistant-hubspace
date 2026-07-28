@@ -2,10 +2,10 @@
 
 from typing import TypeVar
 
-from aioafero import device
-from aioafero.device import AferoCapability, AferoDevice, AferoResource, AferoState
-from aioafero.util import process_function
-from aioafero.v1.models import features
+from ... import device
+from ...device import AferoCapability, AferoDevice, AferoResource, AferoState
+from ...util import process_function
+from ..models import features
 
 from .base import BaseResourcesController
 

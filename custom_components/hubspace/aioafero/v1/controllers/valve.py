@@ -1,10 +1,10 @@
 """Controller holding and managing Afero IoT resources of type `valve`."""
 
-from aioafero import errors
-from aioafero.device import AferoDevice
-from aioafero.v1.models import features
-from aioafero.v1.models.resource import DeviceInformation, ResourceTypes
-from aioafero.v1.models.valve import Valve, ValvePut
+from ... import errors
+from ...device import AferoDevice
+from ..models import features
+from ..models.resource import DeviceInformation, ResourceTypes
+from ..models.valve import Valve, ValvePut
 
 from .base import AferoBinarySensor, AferoSensor, BaseResourcesController
 
