@@ -1,5 +1,26 @@
 # Changelog
 
+## 2026.7.3-beta (2026-07-28)
+
+**Self-healing for unresponsive devices — no more manual reload.** Observed
+live: a light reconnected to Wi-Fi and worked fine in the official Hubspace
+app, but stayed uncontrollable through this integration — every *other*
+device kept polling normally, so nothing tripped the whole-account
+reconnect logic, and the only fix was reloading the integration by hand
+(which works only because it forces a brand-new discovery pass). This
+release automates that: a background watchdog checks every 90s for any
+device that's gone stale and forces an out-of-band discovery refresh
+(rate-limited to once every 2 minutes per stale batch); if a device is
+still stale after 12 minutes despite refreshes, it escalates to a full,
+automatic config-entry reload — the same recovery a user would otherwise
+have to trigger by hand.
+
+**Fixed a related resource leak:** `async_unload_entry` never actually shut
+down the previous coordinator/bridge on reload, so every manual (or now
+automatic) reload leaked the old bridge's background polling tasks running
+orphaned in the background instead of stopping them. Now properly calls
+`coordinator.async_shutdown()` on unload.
+
 ## 2026.7.2-beta (2026-07-28)
 
 **Critical fix: entities stuck permanently `unavailable`.** The vendored

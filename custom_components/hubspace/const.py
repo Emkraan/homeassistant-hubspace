@@ -30,6 +30,20 @@ DEFAULT_STALE_GRACE_MINUTES: Final = 10
 # 30s polling interval this is a 3 minute grace window for one flaky device.
 PER_DEVICE_STALE_MULTIPLIER: Final = 6
 
+# Self-healing for devices that silently stop responding after reconnecting
+# to Wi-Fi/power (confirmed: Afero's state-poll can keep "succeeding" for
+# every *other* device while one specific device just never comes back,
+# and previously only a manual integration reload -- which forces a fresh
+# discovery pass -- would recover it). How often to check for stale devices:
+STALE_DEVICE_CHECK_INTERVAL_SECONDS: Final = 90
+# Minimum time between forced out-of-band discovery refreshes, so a
+# persistently-stale device doesn't hammer Afero's rate-limited API:
+STALE_DEVICE_DISCOVERY_COOLDOWN_MINUTES: Final = 2
+# If a device is still stale this long after first going stale despite
+# repeated discovery refreshes, escalate to a full config-entry reload --
+# the same recovery a user would otherwise have to trigger by hand:
+STALE_DEVICE_RELOAD_THRESHOLD_MINUTES: Final = 12
+
 PLATFORMS: Final = [
     "alarm_control_panel",
     "binary_sensor",

@@ -55,6 +55,11 @@ to work then silently revert a few seconds later. See
   vanishing from Afero's API during a Home-Depot-side backend migration)
   goes `unavailable` on its own. A shared cloud hiccup doesn't take every
   device down with it.
+- **Self-healing** — a device that reconnects to Wi-Fi/power but stays
+  unresponsive is recovered automatically: a background check forces a
+  fresh discovery refresh, escalating to a full automatic reload if a
+  device is still stuck after repeated attempts. No manual "reload
+  integration" needed.
 - **Stale-data tolerance** — brief Afero cloud outages replay the
   last-known-good state for a configurable grace period instead of
   instantly flapping every entity to unavailable.
