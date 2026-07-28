@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026.7.3 (2026-07-28)
+
+First stable release. Same code as `2026.7.3-beta` below — promoted after
+live end-to-end testing (login, all entity platforms, light control, and
+the self-healing recovery path) against a real Hubspace account.
+
 ## 2026.7.3-beta (2026-07-28)
 
 **Self-healing for unresponsive devices — no more manual reload.** Observed
