@@ -21,7 +21,7 @@ from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.helpers.event import async_call_later
+from homeassistant.helpers.event import async_call_later, async_track_time_interval
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util import dt as dt_util
 
@@ -41,6 +41,9 @@ from .const import (
     DOMAIN,
     MIN_POLLING_INTERVAL,
     PER_DEVICE_STALE_MULTIPLIER,
+    STALE_DEVICE_CHECK_INTERVAL_SECONDS,
+    STALE_DEVICE_DISCOVERY_COOLDOWN_MINUTES,
+    STALE_DEVICE_RELOAD_THRESHOLD_MINUTES,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -85,11 +88,19 @@ class HubspaceCoordinator(DataUpdateCoordinator[None]):
         self._disconnected_since: datetime | None = None
         self._unsub_bridge_events: callable | None = None
         self._unsub_stale_check: callable | None = None
+        self._unsub_stale_watchdog: callable | None = None
+        self._stale_since: dict[str, datetime] = {}
+        self._last_discovery_recovery: datetime | None = None
 
     async def _async_setup(self) -> None:
         """Start the bridge and wait for its first poll. Called once by HA."""
         self._unsub_bridge_events = self.bridge.events.subscribe(
             self._handle_bridge_event
+        )
+        self._unsub_stale_watchdog = async_track_time_interval(
+            self.hass,
+            self._async_check_stale_devices,
+            timedelta(seconds=STALE_DEVICE_CHECK_INTERVAL_SECONDS),
         )
         try:
             await self.bridge.initialize()
@@ -120,6 +131,8 @@ class HubspaceCoordinator(DataUpdateCoordinator[None]):
         await super().async_shutdown()
         if self._unsub_stale_check is not None:
             self._unsub_stale_check()
+        if self._unsub_stale_watchdog is not None:
+            self._unsub_stale_watchdog()
         if self._unsub_bridge_events is not None:
             self._unsub_bridge_events()
         await self.bridge.close()
@@ -142,6 +155,63 @@ class HubspaceCoordinator(DataUpdateCoordinator[None]):
             seconds=self.bridge.events.polling_interval * PER_DEVICE_STALE_MULTIPLIER
         )
         return (dt_util.utcnow() - last_seen) <= max_age
+
+    async def _async_check_stale_devices(self, _now) -> None:
+        """Self-heal a device that stopped responding after a Wi-Fi/power drop.
+
+        Confirmed live: a device can reconnect to Wi-Fi (and work fine in the
+        official Hubspace app) while Afero's own state-poll endpoint keeps
+        silently failing to return fresh data for that one device -- every
+        other device polls fine, so this never trips the whole-account
+        DISCONNECTED path. Previously the only recovery was a manual
+        integration reload, which works only because it forces a brand new
+        discovery pass. This does that automatically: a cheap out-of-band
+        discovery refresh first, escalating to a full config-entry reload
+        (the same fix, automated) only if a device is still stale well after
+        repeated refreshes.
+        """
+        now = dt_util.utcnow()
+        stale_ids = [
+            device_id
+            for device_id in self._last_seen
+            if device_id not in self._deleted_ids
+            and not self.device_available(device_id)
+        ]
+        self._stale_since = {
+            device_id: self._stale_since.get(device_id, now) for device_id in stale_ids
+        }
+        if not stale_ids:
+            return
+
+        oldest_stale = min(self._stale_since.values())
+        if now - oldest_stale >= timedelta(
+            minutes=STALE_DEVICE_RELOAD_THRESHOLD_MINUTES
+        ):
+            _LOGGER.warning(
+                "%d device(s) still unresponsive after %d minutes despite "
+                "discovery refreshes; reloading the integration to force a "
+                "full resync",
+                len(stale_ids),
+                STALE_DEVICE_RELOAD_THRESHOLD_MINUTES,
+            )
+            self.hass.async_create_task(
+                self.hass.config_entries.async_reload(self._entry.entry_id)
+            )
+            return
+
+        if self._last_discovery_recovery is not None and now - (
+            self._last_discovery_recovery
+        ) < timedelta(minutes=STALE_DEVICE_DISCOVERY_COOLDOWN_MINUTES):
+            return
+        self._last_discovery_recovery = now
+        _LOGGER.info(
+            "%d device(s) stale; forcing an out-of-band discovery refresh",
+            len(stale_ids),
+        )
+        try:
+            await self.bridge.events.perform_discovery_poll()
+        except Exception as err:  # noqa: BLE001 - best-effort recovery attempt
+            _LOGGER.debug("Stale-device discovery refresh attempt failed: %s", err)
 
     @callback
     def _handle_bridge_event(self, event_type: EventType, data) -> None:

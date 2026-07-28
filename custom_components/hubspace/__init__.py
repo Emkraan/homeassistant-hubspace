@@ -30,5 +30,15 @@ async def _async_options_updated(
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: HubspaceConfigEntry) -> bool:
-    """Unload a config entry."""
-    return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+    """Unload a config entry.
+
+    Must explicitly shut down the coordinator here -- HA does not do this
+    automatically for a coordinator stored on entry.runtime_data. Skipping
+    it previously leaked the old bridge's background polling tasks (and its
+    aiohttp usage) on every reload, since a fresh coordinator/bridge is
+    created on re-setup without the old one ever being told to stop.
+    """
+    unloaded = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+    if unloaded:
+        await entry.runtime_data.async_shutdown()
+    return unloaded
