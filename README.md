@@ -5,7 +5,7 @@
 <h1 align="center">Hubspace Integration for Home Assistant</h1>
 
 <p align="center">
-  Control Hubspace (Afero IoT) lights, fans, switches, locks, valves, thermostats, portable ACs, and security systems from Home Assistant — built from scratch for reliability.
+  Control Hubspace (Afero IoT) lights, fans, switches, locks, valves, thermostats, portable ACs, and security systems from Home Assistant - built from scratch for reliability.
 </p>
 
 <p align="center">
@@ -42,8 +42,8 @@
 ## Why this integration
 
 Home Assistant already has a community Hubspace integration
-(`jdeath/Hubspace-Homeassistant`). This is a separate, from-scratch build —
-not a fork — focused specifically on the reliability gaps in real-world use:
+(`jdeath/Hubspace-Homeassistant`). This is a separate, from-scratch build -
+not a fork - focused specifically on the reliability gaps in real-world use:
 devices that go unavailable and never recover, one flaky device taking every
 other device down with it, opaque setup failures, and commands that appear
 to work then silently revert a few seconds later. See
@@ -51,27 +51,27 @@ to work then silently revert a few seconds later. See
 
 ## Features
 
-- **Per-device availability** — a single device dropping off Wi-Fi (or
+- **Per-device availability** - a single device dropping off Wi-Fi (or
   vanishing from Afero's API during a Home-Depot-side backend migration)
   goes `unavailable` on its own. A shared cloud hiccup doesn't take every
   device down with it.
-- **Self-healing** — a device that reconnects to Wi-Fi/power but stays
+- **Self-healing** - a device that reconnects to Wi-Fi/power but stays
   unresponsive is recovered automatically: a background check forces a
   fresh discovery refresh, escalating to a full automatic reload if a
   device is still stuck after repeated attempts. No manual "reload
   integration" needed.
-- **Stale-data tolerance** — brief Afero cloud outages replay the
+- **Stale-data tolerance** - brief Afero cloud outages replay the
   last-known-good state for a configurable grace period instead of
   instantly flapping every entity to unavailable.
-- **Automatic re-authentication** — token refresh runs proactively with a
+- **Automatic re-authentication** - token refresh runs proactively with a
   safety margin; a dead refresh token now correctly falls back to a full
   login instead of repeating the same failed request.
-- **Multi-zone lights supported natively** — dual-channel/color+white
+- **Multi-zone lights supported natively** - dual-channel/color+white
   fixtures show up as separate light entities per zone.
-- **Full device coverage** — lights, fans, switches (including multi-outlet
+- **Full device coverage** - lights, fans, switches (including multi-outlet
   power strips), locks, valves, thermostats, portable ACs, and security
   systems (panel + zone sensors + keypad).
-- **UI configuration** — add the integration from Settings → Devices &
+- **UI configuration** - add the integration from Settings → Devices &
   Services. Supports MFA/one-time-passcode accounts and re-authentication
   when your password changes.
 
@@ -122,7 +122,7 @@ Options (Settings → Devices & Services → Hubspace → Configure):
 
 | Option | Default | Purpose |
 |---|---|---|
-| State polling interval | 30s | How often device state is refreshed. Floored at 2s — Afero rate-limits aggressively. |
+| State polling interval | 30s | How often device state is refreshed. Floored at 2s - Afero rate-limits aggressively. |
 | Device discovery interval | 3600s | How often the full device list is re-fetched (cheap deltas use the interval above; this is the expensive full-metadata call). |
 | Keep last-known data during brief cloud outages | On | Ride out short Afero cloud blips without flapping entities to unavailable. |
 | Stale-data grace period | 10 min | How long to tolerate a cloud outage before entities do go unavailable. |
@@ -130,7 +130,7 @@ Options (Settings → Devices & Services → Hubspace → Configure):
 ## Entities
 
 Entity availability depends on the specific device's own capabilities as
-reported by Afero — not every field below exists on every model.
+reported by Afero - not every field below exists on every model.
 
 | Platform | Devices | Notes |
 |---|---|---|
@@ -148,7 +148,7 @@ reported by Afero — not every field below exists on every model.
 
 Exhaust fans are a special case: Afero exposes their toggle, fan speed, and
 light as separate `switch`/`fan`/`light` entities rather than one combined
-device — this mirrors how Afero's own API models them, not a limitation of
+device - this mirrors how Afero's own API models them, not a limitation of
 this integration.
 
 ## Automations
@@ -208,7 +208,7 @@ automation:
 | Setup fails with "unknown error" | Afero's login page changed, or a genuinely unexpected response | Enable debug logging (below) and check the log for the actual exception; open an issue with the redacted log |
 | One device is `unavailable`, others are fine | That specific device stopped reporting (Wi-Fi drop, or removed from your Afero account) | Check the device in the Hubspace app; if it's really gone, remove it in HA too |
 | Every device is `unavailable` at once | Afero's cloud is down or your account's connection was lost | Check whether the Hubspace app itself works right now; if not, this is an upstream outage, not a bug here |
-| A command seems to revert a few seconds after you set it | Historically the most common Hubspace complaint — a stale poll response overwriting an optimistic update | This integration only applies poll-response fields matching a command it just sent, specifically to prevent this; if you still see it, please file a bug with debug logs |
+| A command seems to revert a few seconds after you set it | Historically the most common Hubspace complaint - a stale poll response overwriting an optimistic update | This integration only applies poll-response fields matching a command it just sent, specifically to prevent this; if you still see it, please file a bug with debug logs |
 | Setup asks for a one-time code every time | Your account has MFA enabled | Enter the current code from your authenticator/email each time you set up or re-authenticate |
 | A device shows the wrong entity type (e.g. a dimmer showing as a plain switch) | Afero's own device metadata doesn't always self-describe correctly | File a feature request with the device's raw payload (see the issue template) |
 
@@ -223,7 +223,7 @@ logger:
 
 ## How it works
 
-Hubspace runs entirely on Afero's cloud (`iot_class: cloud_polling` — there
+Hubspace runs entirely on Afero's cloud (`iot_class: cloud_polling` - there
 is no local control path). Authentication is OAuth2 Authorization
 Code + PKCE against a Keycloak identity provider
 (`accounts.hubspaceconnect.com`), performed the same way the official app
@@ -231,7 +231,7 @@ does it. Access tokens last only 118 seconds; this integration refreshes
 proactively with a safety margin rather than waiting for a request to fail.
 
 Every device exposes a set of "functions" (its capability schema) and
-"states" (current values), keyed by `(functionClass, functionInstance)` —
+"states" (current values), keyed by `(functionClass, functionInstance)` -
 e.g. a combo fixture's power state might be keyed `power` /
 `light-power` vs `power` / `fan-power`. State is fetched on two cadences: a
 cheap per-device delta poll (30s default) and a more expensive full
@@ -241,7 +241,7 @@ discovery poll (hourly default) that picks up new/removed devices.
 
 The cloud protocol client is vendored from
 [`aioafero`](https://github.com/Expl0dingBanana/aioafero) by Chris Dohmen
-(MIT License) — see
+(MIT License) - see
 [`custom_components/hubspace/aioafero/NOTICE.md`](custom_components/hubspace/aioafero/NOTICE.md)
 for the exact local patches on top of upstream. Everything above that layer
 (config flow, coordinator, entity platforms) is written fresh for this
@@ -249,5 +249,5 @@ integration.
 
 ## License
 
-MIT — see [LICENSE](LICENSE). The vendored `aioafero` client retains its
+MIT - see [LICENSE](LICENSE). The vendored `aioafero` client retains its
 own MIT copyright; see the Credits & attribution section above.
