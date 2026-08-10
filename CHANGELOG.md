@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026.8.10 (2026-08-10)
+
+Repo standard compliance updates. No functional changes since 2026.7.3.
+
+### Changed
+- Migrated from Dependabot to Renovate for dependency updates.
+- CI now uses the shared `ha-shared-workflows` reusable workflow.
+- Exempted `renovate[bot]` from the readme-freshness gate.
+
 ## 2026.7.3 (2026-07-28)
 
 First stable release. Same code as `2026.7.3-beta` below — promoted after
