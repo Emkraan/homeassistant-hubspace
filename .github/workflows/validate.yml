@@ -24,4 +24,3 @@ jobs:
       - name: Report fail
         if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
         run: exit 1
-
