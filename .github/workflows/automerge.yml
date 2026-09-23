@@ -1,25 +1,16 @@
 name: automerge
 
-# Repo-level auto-merge for BOTH plain repos and merge-queue repos.
-#
-# Triggered by workflow_run on this repo's CI workflow completing, NOT
-# check_suite: GitHub creates no workflow runs from events triggered by
-# GITHUB_TOKEN, so check_suite.completed never re-fires this workflow and a PR
-# that went green after its open-time run sat stranded (clean but never merged).
-# workflow_run chains off a named workflow finishing and is not blocked that way.
-#
-# A PR is ready when mergeStateStatus is CLEAN, OR UNSTABLE with mergeable
-# MERGEABLE: a failing/pending REQUIRED check reads BLOCKED, so UNSTABLE means
-# branch protection is satisfied and only a non-required context (often this
-# automerge run itself, in progress) is not green. Gating on strict CLEAN let a
-# PR pin itself open forever behind its own run.
-#
-# Branch protection (required reviews/checks) still fully applies: the enqueue
-# and merge mutations enforce it, and expectedHeadOid guards the direct merge.
+# Thin caller. All merge logic lives in the fleet reusable workflow
+# Emkraan/.github/.github/workflows/reusable-automerge.yml (standard: apollo
+# docs/standards/github-repo-standard.md Section 8). Never add merge logic here; change
+# the reusable workflow instead. Only the triggers are repo-specific:
+# `workflow_run.workflows` must list EVERY workflow in this repo that runs on
+# pull_request (matched by workflow `name:`, not job name), so automerge re-evaluates
+# after the last PR check finishes.
 
 on:
   pull_request:
-    types: [opened, reopened, synchronize, ready_for_review]
+    types: [opened, reopened, synchronize, ready_for_review, closed]
   pull_request_review:
     types: [submitted]
   workflow_run:
@@ -32,6 +23,10 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  issues: write
+  checks: read
+  statuses: read
+  actions: read
 
 concurrency:
   group: automerge-${{ github.event.pull_request.number || github.event.workflow_run.id }}
@@ -39,77 +34,6 @@ concurrency:
 
 jobs:
   automerge:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/github-script@v9
-        with:
-          script: |
-            const {owner, repo} = context.repo;
-
-            let numbers = [];
-            if (context.eventName === 'pull_request' || context.eventName === 'pull_request_review') {
-              numbers = [context.payload.pull_request.number];
-            } else if (context.eventName === 'workflow_run') {
-              numbers = (context.payload.workflow_run.pull_requests || []).map(p => p.number);
-            }
-            if ((context.eventName === 'schedule' || context.eventName === 'workflow_dispatch') && numbers.length === 0) {
-              // Safety-net sweep: every open, non-draft PR. Recovers a green PR that
-              // stranded with no pending event to re-fire the paths above (e.g. it fell
-              // out of the merge queue after enqueue).
-              const {data} = await github.rest.pulls.list({owner, repo, state: 'open', per_page: 100});
-              numbers = data.filter(p => !p.draft).map(p => p.number);
-            }
-            if (numbers.length === 0) { core.info('no candidate PRs'); return; }
-
-            const Q = `query($o:String!,$r:String!,$n:Int!){
-              repository(owner:$o,name:$r){
-                mergeQueue{ id }
-                pullRequest(number:$n){
-                  id number isDraft state merged isInMergeQueue mergeStateStatus mergeable headRefOid
-                }
-              }
-            }`;
-            const ENQUEUE = `mutation($id:ID!){ enqueuePullRequest(input:{pullRequestId:$id}){ mergeQueueEntry{ position } } }`;
-            const AUTOMERGE = `mutation($id:ID!){ enablePullRequestAutoMerge(input:{pullRequestId:$id, mergeMethod:SQUASH}){ pullRequest{ number } } }`;
-            const MERGE = `mutation($id:ID!,$oid:GitObjectID!){ mergePullRequest(input:{pullRequestId:$id, mergeMethod:SQUASH, expectedHeadOid:$oid}){ pullRequest{ number merged } } }`;
-            const sleep = ms => new Promise(r => setTimeout(r, ms));
-
-            const isReady = (pr) =>
-              pr.mergeStateStatus === 'CLEAN' ||
-              (pr.mergeStateStatus === 'UNSTABLE' && pr.mergeable === 'MERGEABLE');
-
-            for (const n of numbers) {
-              let data;
-              for (let i = 0; i < 6; i++) {
-                data = await github.graphql(Q, {o: owner, r: repo, n});
-                if (data.repository.pullRequest.mergeStateStatus !== 'UNKNOWN') break;
-                await sleep(5000);
-              }
-              const pr = data.repository.pullRequest;
-              const hasQueue = !!data.repository.mergeQueue;
-              if (!pr || pr.state !== 'OPEN' || pr.merged) { core.info(`#${n}: not an open PR`); continue; }
-              if (pr.isDraft) { core.info(`#${n}: draft, skipping`); continue; }
-              if (pr.isInMergeQueue) { core.info(`#${n}: already in merge queue`); continue; }
-
-              const ready = isReady(pr);
-              if (hasQueue) {
-                if (ready) {
-                  try { await github.graphql(ENQUEUE, {id: pr.id}); core.info(`#${n}: enqueued`); }
-                  catch (e) { core.info(`#${n}: enqueue not accepted yet (${e.message})`); }
-                } else {
-                  core.info(`#${n}: mergeStateStatus=${pr.mergeStateStatus}, waiting for a later workflow_run event`);
-                }
-              } else {
-                if (ready) {
-                  try {
-                    await github.graphql(MERGE, {id: pr.id, oid: pr.headRefOid});
-                    core.info(`#${n}: merged (squash)`);
-                    continue;
-                  } catch (e) {
-                    core.info(`#${n}: direct merge not accepted (${e.message}); falling back to auto-merge`);
-                  }
-                }
-                try { await github.graphql(AUTOMERGE, {id: pr.id}); core.info(`#${n}: auto-merge enabled`); }
-                catch (e) { core.info(`#${n}: auto-merge enable skipped (${e.message})`); }
-              }
-            }
+    uses: Emkraan/.github/.github/workflows/reusable-automerge.yml@main
+    with:
+      runs-on: '"ubuntu-latest"'
