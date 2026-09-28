@@ -4,12 +4,12 @@ __all__ = ["AferoAuth", "TokenData", "passthrough"]
 
 import asyncio
 import base64
-from contextlib import contextmanager
 import datetime
 import hashlib
 import logging
 import os
 import re
+from contextlib import contextmanager
 from typing import Final, NamedTuple
 from urllib.parse import parse_qs, urlparse
 
@@ -19,7 +19,6 @@ from bs4 import BeautifulSoup
 from securelogging import LogRedactorMessage, add_secret, remove_secret
 
 from ..errors import InvalidAuth, InvalidOTP, InvalidResponse, OTPRequired
-
 from . import v1_const
 
 logger = logging.getLogger(__name__)
@@ -140,12 +139,8 @@ class AferoAuth:
         """
         code_params: dict[str, str] = {
             "response_type": "code",
-            "client_id": v1_const.AFERO_CLIENTS[self._afero_client][
-                "AUTH_DEFAULT_CLIENT_ID"
-            ],
-            "redirect_uri": v1_const.AFERO_CLIENTS[self._afero_client][
-                "AUTH_DEFAULT_REDIRECT_URI"
-            ],
+            "client_id": v1_const.AFERO_CLIENTS[self._afero_client]["AUTH_DEFAULT_CLIENT_ID"],
+            "redirect_uri": v1_const.AFERO_CLIENTS[self._afero_client]["AUTH_DEFAULT_REDIRECT_URI"],
             "code_challenge": challenge.challenge,
             "code_challenge_method": "S256",
             "scope": "openid offline_access",
@@ -196,9 +191,7 @@ class AferoAuth:
         logger.debug("Challenge information: %s", chal)
         return chal
 
-    async def generate_code(
-        self, data: AuthSessionData, challenge: AuthChallenge
-    ) -> str:
+    async def generate_code(self, data: AuthSessionData, challenge: AuthChallenge) -> str:
         """Finalize login to Afero IoT page.
 
         :param session_code: Session code during form interaction
@@ -247,9 +240,7 @@ class AferoAuth:
             }
             raise OTPRequired
         if response.status != 302:
-            raise InvalidAuth(
-                "Unable to authenticate with the supplied username / password"
-            )
+            raise InvalidAuth("Unable to authenticate with the supplied username / password")
         return await AferoAuth.parse_code(response)
 
     @staticmethod
@@ -296,18 +287,14 @@ class AferoAuth:
                     "AUTH_DEFAULT_REDIRECT_URI"
                 ],
                 "code_verifier": challenge.verifier,
-                "client_id": v1_const.AFERO_CLIENTS[self._afero_client][
-                    "AUTH_DEFAULT_CLIENT_ID"
-                ],
+                "client_id": v1_const.AFERO_CLIENTS[self._afero_client]["AUTH_DEFAULT_CLIENT_ID"],
             }
         else:
             data = {
                 "grant_type": "refresh_token",
                 "refresh_token": self._token_data.refresh_token,
                 "scope": "openid email offline_access profile",
-                "client_id": v1_const.AFERO_CLIENTS[self._afero_client][
-                    "AUTH_DEFAULT_CLIENT_ID"
-                ],
+                "client_id": v1_const.AFERO_CLIENTS[self._afero_client]["AUTH_DEFAULT_CLIENT_ID"],
             }
         url = self.generate_auth_url(v1_const.AFERO_GENERICS["AUTH_TOKEN_ENDPOINT"])
         with self.secret_logger():
@@ -328,18 +315,14 @@ class AferoAuth:
         try:
             resp_json = await response.json()
         except (ValueError, ContentTypeError) as err:
-            raise InvalidResponse(
-                "Unexpected data returned during token refresh"
-            ) from err
+            raise InvalidResponse("Unexpected data returned during token refresh") from err
         if response.status != 200:
             if resp_json and resp_json.get("error") == "invalid_grant":
                 raise InvalidAuth
             try:
                 response.raise_for_status()
             except ClientResponseError as err:
-                raise InvalidResponse(
-                    "Unexpected data returned during token refresh"
-                ) from err
+                raise InvalidResponse("Unexpected data returned during token refresh") from err
         try:
             refresh_token = resp_json["refresh_token"]
             access_token = resp_json["access_token"]
@@ -366,9 +349,7 @@ class AferoAuth:
         challenge = await AferoAuth.generate_challenge_data()
         code: str = await self.webapp_login(challenge)
         self.logger.debug("Successfully generated an auth code")
-        refresh_token = await self.generate_refresh_token(
-            code=code, challenge=challenge
-        )
+        refresh_token = await self.generate_refresh_token(code=code, challenge=challenge)
         self.logger.debug("Successfully generated a refresh token")
         return refresh_token
 
@@ -426,9 +407,7 @@ class AferoAuth:
         invalidate_refresh_token = False
         async with self._async_lock:
             if not self._token_data:
-                self.logger.debug(
-                    "Refresh token not present. Generating a new refresh token"
-                )
+                self.logger.debug("Refresh token not present. Generating a new refresh token")
                 self._token_data = await self.perform_initial_login()
             if await self.is_expired:
                 self.logger.debug("Token has not been generated or is expired")

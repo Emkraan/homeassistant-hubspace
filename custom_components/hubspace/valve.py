@@ -6,7 +6,6 @@ one independently controllable zone, keyed by ``functionInstance``.
 
 from __future__ import annotations
 
-
 from homeassistant.components.valve import ValveEntity, ValveEntityFeature
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -54,12 +53,8 @@ class HubspaceValve(HubspaceEntity, ValveEntity):
 
     async def async_open_valve(self) -> None:
         """Open the valve."""
-        await self.coordinator.bridge.valves.turn_on(
-            self.device_id, instance=self.instance
-        )
+        await self.coordinator.bridge.valves.turn_on(self.device_id, instance=self.instance)
 
     async def async_close_valve(self) -> None:
         """Close the valve."""
-        await self.coordinator.bridge.valves.turn_off(
-            self.device_id, instance=self.instance
-        )
+        await self.coordinator.bridge.valves.turn_off(self.device_id, instance=self.instance)

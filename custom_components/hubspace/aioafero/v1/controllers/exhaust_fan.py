@@ -8,7 +8,6 @@ from ..models import features
 from ..models.exhaust_fan import ExhaustFan, ExhaustFanPut
 from ..models.features import NumbersFeature, SelectFeature
 from ..models.resource import DeviceInformation, ResourceTypes
-
 from .base import AferoBinarySensor, AferoSensor, BaseResourcesController, NumbersName
 from .event import CallbackResponse
 

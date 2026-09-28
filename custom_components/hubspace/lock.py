@@ -55,9 +55,7 @@ class HubspaceLock(HubspaceEntity, LockEntity):
     def is_unlocking(self) -> bool:
         """Return true if the lock is currently unlocking."""
         position = self.resource.position
-        return (
-            position is not None and position.position == CurrentPositionEnum.UNLOCKING
-        )
+        return position is not None and position.position == CurrentPositionEnum.UNLOCKING
 
     async def async_lock(self, **kwargs: Any) -> None:
         """Lock the device."""

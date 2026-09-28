@@ -12,9 +12,7 @@ ANONYMIZE_STATES: set[str] = {"wifi-ssid", "wifi-mac-address", "ble-mac-address"
 FNAME_IND: int = 0
 
 
-def anonymize_devices(
-    devices: list[AferoDevice], anon_name: bool = False
-) -> list[dict]:
+def anonymize_devices(devices: list[AferoDevice], anon_name: bool = False) -> list[dict]:
     """Remove identifying information from the device.
 
     :param devices: List of devices to anonymize
@@ -74,7 +72,6 @@ def anonymize_state(state: AferoState, only_geo: bool = False) -> dict:
     fake_state["lastUpdateTime"] = 0
     if fake_state["functionClass"] == "geo-coordinates":
         fake_state["value"] = {"geo-coordinates": {"latitude": "0", "longitude": "0"}}
-    elif not only_geo:
-        if fake_state["functionClass"] in ANONYMIZE_STATES:
-            fake_state["value"] = str(uuid4())
+    elif not only_geo and fake_state["functionClass"] in ANONYMIZE_STATES:
+        fake_state["value"] = str(uuid4())
     return fake_state

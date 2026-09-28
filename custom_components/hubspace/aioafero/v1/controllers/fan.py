@@ -5,7 +5,6 @@ from ...util import ordered_list_item_to_percentage
 from ..models import features
 from ..models.fan import Fan, FanPut
 from ..models.resource import DeviceInformation, ResourceTypes
-
 from .base import AferoBinarySensor, AferoSensor, BaseResourcesController
 
 KNOWN_PRESETS = {"comfort-breeze"}
@@ -107,10 +106,7 @@ class FanController(BaseResourcesController[Fan]):
                 speed = features.SpeedFeature(speed=percentage, speeds=speeds)
             elif state.functionClass == "fan-reverse":
                 direction = features.DirectionFeature(forward=state.value == "forward")
-            elif (
-                state.functionClass == "toggle"
-                and state.functionInstance in KNOWN_PRESETS
-            ):
+            elif state.functionClass == "toggle" and state.functionInstance in KNOWN_PRESETS:
                 # I have only seen fans with a single preset
                 preset = features.PresetFeature(
                     enabled=state.value == "enabled",
@@ -159,9 +155,7 @@ class FanController(BaseResourcesController[Fan]):
                     cur_item.on.on = new_val
                     updated_keys.add("on")
             elif state.functionClass == "fan-speed":
-                new_val = ordered_list_item_to_percentage(
-                    cur_item.speed.speeds, state.value
-                )
+                new_val = ordered_list_item_to_percentage(cur_item.speed.speeds, state.value)
                 if cur_item.speed.speed != new_val:
                     cur_item.speed.speed = new_val
                     updated_keys.add("speed")
@@ -170,10 +164,7 @@ class FanController(BaseResourcesController[Fan]):
                 if cur_item.direction.forward != new_val:
                     cur_item.direction.forward = new_val
                     updated_keys.add("direction")
-            elif (
-                state.functionClass == "toggle"
-                and state.functionInstance in KNOWN_PRESETS
-            ):
+            elif state.functionClass == "toggle" and state.functionInstance in KNOWN_PRESETS:
                 new_val = state.value == "enabled"
                 if cur_item.preset.enabled != new_val:
                     cur_item.preset.enabled = new_val
@@ -211,9 +202,7 @@ class FanController(BaseResourcesController[Fan]):
             if speed == 0:
                 update_obj.on = features.OnFeature(on=False)
             else:
-                update_obj.speed = features.SpeedFeature(
-                    speed=speed, speeds=cur_item.speed.speeds
-                )
+                update_obj.speed = features.SpeedFeature(speed=speed, speeds=cur_item.speed.speeds)
         if preset is not None and cur_item.preset is not None:
             update_obj.preset = features.PresetFeature(
                 enabled=preset,

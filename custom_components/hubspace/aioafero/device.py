@@ -7,8 +7,8 @@ __all__ = [
     "get_afero_device",
     "get_function_from_device",
 ]
-from dataclasses import asdict, dataclass, field, fields
 import logging
+from dataclasses import asdict, dataclass, field, fields
 from typing import Any, TypeVar
 
 from .util import normalize_afero_last_update_time_ms
@@ -86,10 +86,7 @@ class AferoDevice:
         ):
             self.device_class = "light"
         # Fix exhaust fans
-        if (
-            self.device_class == "exhaust-fan"
-            and self.default_image == "fan-exhaust-icon"
-        ):
+        if self.device_class == "exhaust-fan" and self.default_image == "fan-exhaust-icon":
             self.model = "BF1112"
         # Fix fans
         if self.device_class in ["fan", "ceiling-fan"]:
@@ -97,14 +94,9 @@ class AferoDevice:
                 self.model = "Driskol"
             elif not self.model and self.default_image == "ceiling-fan-vinings-icon":
                 self.model = "Vinwood"
-            elif (
-                self.model == "TBD" and self.default_image == "ceiling-fan-chandra-icon"
-            ):
+            elif self.model == "TBD" and self.default_image == "ceiling-fan-chandra-icon":
                 self.model = "Zandra"
-            elif (
-                self.model == "TBD"
-                and self.default_image == "ceiling-fan-ac-cct-dardanus-icon"
-            ):
+            elif self.model == "TBD" and self.default_image == "ceiling-fan-ac-cct-dardanus-icon":
                 self.model = "Nevali"
             elif not self.model and self.default_image == "ceiling-fan-slender-icon":
                 self.model = "Tager"
@@ -137,9 +129,7 @@ def transform_capability(capability: dict[str, Any]) -> AferoCapability:
         for x in fields(AferoCapability)
         if not x.name.startswith("_")
     }
-    extra_fields = {
-        key: capability[key] for key in capability if key not in top_level_fields
-    }
+    extra_fields = {key: capability[key] for key in capability if key not in top_level_fields}
     return AferoCapability(**top_level_fields, _opts=extra_fields)
 
 
@@ -153,9 +143,7 @@ def convert_state(state: dict[str, Any]) -> AferoState:
     )
 
 
-def merge_afero_states(
-    existing: list[AferoState], incoming: list[AferoState]
-) -> list[AferoState]:
+def merge_afero_states(existing: list[AferoState], incoming: list[AferoState]) -> list[AferoState]:
     """Merge incoming states into existing by functionClass and functionInstance."""
     merged = {(s.functionClass, s.functionInstance): s for s in existing}
     for state in incoming:
@@ -169,8 +157,7 @@ def get_afero_device(afero_device: dict[str, Any]) -> AferoDevice:
     device = description.get("device", {})
     processed_states: list[AferoState] = []
     processed_states = [
-        convert_state(state)
-        for state in afero_device.get("state", {}).get("values", [])
+        convert_state(state) for state in afero_device.get("state", {}).get("values", [])
     ]
     processed_capabilities = [
         transform_capability(cap) for cap in afero_device.get("capabilities", [])
@@ -223,10 +210,7 @@ def get_capability_from_device(
     :param function_instance: Function instance to find. Default: None
     """
     for cap in capabilities:
-        if (
-            cap.functionClass != function_class
-            or cap.functionInstance != function_instance
-        ):
+        if cap.functionClass != function_class or cap.functionInstance != function_instance:
             continue
         return cap
     return None

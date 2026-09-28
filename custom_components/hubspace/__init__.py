@@ -22,9 +22,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: HubspaceConfigEntry) -> 
     return True
 
 
-async def _async_options_updated(
-    hass: HomeAssistant, entry: HubspaceConfigEntry
-) -> None:
+async def _async_options_updated(hass: HomeAssistant, entry: HubspaceConfigEntry) -> None:
     """Reload the entry whenever the options flow saves changes."""
     await hass.config_entries.async_reload(entry.entry_id)
 

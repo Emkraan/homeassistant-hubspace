@@ -3,7 +3,6 @@
 from dataclasses import dataclass, field
 
 from . import features
-
 from .hvac_mixin import HVACMixin
 from .resource import ResourceTypes
 from .standard_mixin import StandardMixin

@@ -7,7 +7,6 @@ from ...util import process_function
 from ..models import features
 from ..models.resource import DeviceInformation, ResourceTypes
 from ..models.thermostat import Thermostat, ThermostatPut
-
 from .climate import ClimateController
 
 
@@ -85,12 +84,8 @@ class ThermostatController(ClimateController[Thermostat]):
             hvac_mode=climate_data["hvac_mode"],
             safety_max_temp=climate_data["safety_max_temp"],
             safety_min_temp=climate_data["safety_min_temp"],
-            target_temperature_auto_cooling=climate_data[
-                "target_temperature_auto_cooling"
-            ],
-            target_temperature_auto_heating=climate_data[
-                "target_temperature_auto_heating"
-            ],
+            target_temperature_auto_cooling=climate_data["target_temperature_auto_cooling"],
+            target_temperature_auto_heating=climate_data["target_temperature_auto_heating"],
             target_temperature_cooling=climate_data["target_temperature_cooling"],
             target_temperature_heating=climate_data["target_temperature_heating"],
         )
@@ -142,9 +137,7 @@ class ThermostatController(ClimateController[Thermostat]):
         """
         return await self.set_state(device_id, hvac_mode=hvac_mode)
 
-    async def set_target_temperature(
-        self, device_id: str, target_temperature: float
-    ) -> None:
+    async def set_target_temperature(self, device_id: str, target_temperature: float) -> None:
         """Set target temperature for the active heat/cool mode.
 
         Args:

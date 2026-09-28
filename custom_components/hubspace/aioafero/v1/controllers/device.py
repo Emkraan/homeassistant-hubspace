@@ -3,7 +3,6 @@
 from ...device import AferoDevice
 from ..models.device import Device
 from ..models.resource import DeviceInformation, ResourceTypes
-
 from .base import AferoBinarySensor, AferoSensor, BaseResourcesController
 from .event import AferoEvent, EventType
 
@@ -142,8 +141,7 @@ class DeviceController(BaseResourcesController[Device]):
             if device.children:
                 parents[device.device_id] = device
             elif device.device_id not in parents and (
-                device.device_id not in parents
-                and device.device_id not in potential_parents
+                device.device_id not in parents and device.device_id not in potential_parents
             ):
                 potential_parents[device.device_id] = device
             else:

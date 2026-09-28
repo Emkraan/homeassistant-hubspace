@@ -4,7 +4,6 @@ from ...device import AferoDevice
 from ..models import features
 from ..models.lock import Lock, LockPut
 from ..models.resource import DeviceInformation, ResourceTypes
-
 from .base import AferoBinarySensor, AferoSensor, BaseResourcesController
 
 
@@ -23,9 +22,7 @@ class LockController(BaseResourcesController[Lock]):
             device_id: Device ID from this controller.
 
         """
-        await self.set_state(
-            device_id, lock_position=features.CurrentPositionEnum.LOCKING
-        )
+        await self.set_state(device_id, lock_position=features.CurrentPositionEnum.LOCKING)
 
     async def unlock(self, device_id: str) -> None:
         """Disengage the lock.
@@ -34,9 +31,7 @@ class LockController(BaseResourcesController[Lock]):
             device_id: Device ID from this controller.
 
         """
-        await self.set_state(
-            device_id, lock_position=features.CurrentPositionEnum.UNLOCKING
-        )
+        await self.set_state(device_id, lock_position=features.CurrentPositionEnum.UNLOCKING)
 
     async def initialize_elem(self, afero_device: AferoDevice) -> Lock:
         """Initialize the element.
@@ -113,7 +108,5 @@ class LockController(BaseResourcesController[Lock]):
         """
         update_obj = LockPut()
         if lock_position is not None:
-            update_obj.position = features.CurrentPositionFeature(
-                position=lock_position
-            )
+            update_obj.position = features.CurrentPositionFeature(position=lock_position)
         await self.update(device_id, obj_in=update_obj)

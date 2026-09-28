@@ -53,12 +53,8 @@ class HubspaceSwitch(HubspaceEntity, SwitchEntity):
 
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn the switch on."""
-        await self.coordinator.bridge.switches.turn_on(
-            self.device_id, instance=self.instance
-        )
+        await self.coordinator.bridge.switches.turn_on(self.device_id, instance=self.instance)
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn the switch off."""
-        await self.coordinator.bridge.switches.turn_off(
-            self.device_id, instance=self.instance
-        )
+        await self.coordinator.bridge.switches.turn_off(self.device_id, instance=self.instance)
