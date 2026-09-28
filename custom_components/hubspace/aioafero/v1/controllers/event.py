@@ -1,9 +1,9 @@
 """Handle connecting to Afero IoT and distribute events."""
 
 import asyncio
-from collections.abc import Callable
 import contextlib
 import datetime
+from collections.abc import Callable
 from enum import Enum
 from inspect import iscoroutinefunction
 from types import NoneType
@@ -127,9 +127,7 @@ class EventStream:
         if self._version_poll_time is None:
             self._version_poll_time = now
             return True
-        if (
-            now - self._version_poll_time
-        ).total_seconds() >= VERSION_POLL_INTERVAL_SECONDS:
+        if (now - self._version_poll_time).total_seconds() >= VERSION_POLL_INTERVAL_SECONDS:
             self._version_poll_time = now
             return True
         return False
@@ -209,9 +207,7 @@ class EventStream:
         """Blocking call until everything has finished."""
         attempt = 0
         while not self._event_queue.empty():
-            self._logger.debug(
-                "Number of events in queue: %d", self._event_queue.qsize()
-            )
+            self._logger.debug("Number of events in queue: %d", self._event_queue.qsize())
             await asyncio.sleep(0.01)
             attempt += 1
             if attempt > 100:
@@ -240,9 +236,7 @@ class EventStream:
                 ):
                     continue
                 if iscoroutinefunction(callback):
-                    self._bridge.add_job(
-                        asyncio.create_task(callback(event_type, data))
-                    )
+                    self._bridge.add_job(asyncio.create_task(callback(event_type, data)))
                 else:
                     callback(event_type, data)
             except Exception:
@@ -269,9 +263,7 @@ class EventStream:
         consecutive_http_errors = 0
         while True:
             try:
-                data = await self._bridge.fetch_discovery_data(
-                    version_poll=self.poll_version
-                )
+                data = await self._bridge.fetch_discovery_data(version_poll=self.poll_version)
             except TimeoutError:
                 self._logger.warning("Timeout when contacting Afero IoT API.")
                 await self.process_backoff(consecutive_http_errors)
@@ -283,15 +275,11 @@ class EventStream:
                 consecutive_http_errors += 1
                 await self.process_backoff(consecutive_http_errors)
             except TypeError as err:
-                self._logger.warning(
-                    "Unexpected data from Afero IoT API, %s.", err.args[0]
-                )
+                self._logger.warning("Unexpected data from Afero IoT API, %s.", err.args[0])
                 consecutive_http_errors += 1
                 await self.process_backoff(consecutive_http_errors)
             except Exception:
-                self._logger.exception(
-                    "Unknown error occurred. Please open a bug report."
-                )
+                self._logger.exception("Unknown error occurred. Please open a bug report.")
                 raise
             else:
                 # Successful connection
@@ -303,9 +291,7 @@ class EventStream:
                     self.emit(EventType.CONNECTED)
                 return data
 
-    async def generate_devices_from_data(
-        self, data: list[dict[Any, str]]
-    ) -> list[AferoDevice]:
+    async def generate_devices_from_data(self, data: list[dict[Any, str]]) -> list[AferoDevice]:
         """Generate all devices from a given payload.
 
         Generating devices will attempt to split devices where required and remove
@@ -449,10 +435,7 @@ class EventStream:
                     consecutive_state_errors,
                     exc_info=True,
                 )
-                if (
-                    consecutive_state_errors == 1
-                    and self._status == EventStreamStatus.CONNECTED
-                ):
+                if consecutive_state_errors == 1 and self._status == EventStreamStatus.CONNECTED:
                     self._status = EventStreamStatus.DISCONNECTED
                     self.emit(EventType.DISCONNECTED)
                 continue

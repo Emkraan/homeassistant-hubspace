@@ -3,7 +3,6 @@
 from dataclasses import dataclass
 
 from . import features
-
 from .resource import ResourceTypes
 from .standard_mixin import StandardMixin
 

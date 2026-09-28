@@ -5,7 +5,6 @@ from ...device import AferoDevice
 from ..models import features
 from ..models.resource import DeviceInformation, ResourceTypes
 from ..models.switch import Switch, SwitchPut
-
 from .base import AferoBinarySensor, AferoSensor, BaseResourcesController
 
 

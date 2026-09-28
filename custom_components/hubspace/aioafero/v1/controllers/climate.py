@@ -6,7 +6,6 @@ from ... import device
 from ...device import AferoCapability, AferoDevice, AferoResource, AferoState
 from ...util import process_function
 from ..models import features
-
 from .base import BaseResourcesController
 
 AferoResourceT = TypeVar("AferoResourceT", bound=AferoResource)
@@ -22,9 +21,7 @@ TARGET_INSTANCE_MAPPING = {
 }
 
 
-def generate_target_temp(
-    func_def: dict, state: AferoState
-) -> features.TargetTemperatureFeature:
+def generate_target_temp(func_def: dict, state: AferoState) -> features.TargetTemperatureFeature:
     """Determine the target temp based on the function definition."""
     return features.TargetTemperatureFeature(
         value=round(state.value, 1),
@@ -71,12 +68,10 @@ class ClimateController(BaseResourcesController[AferoResourceT]):
         for state in afero_device.states:
             if state.functionClass == "temperature":
                 if state.functionInstance == "current-temp":
-                    climate_data["current_temperature"] = (
-                        features.CurrentTemperatureFeature(
-                            temperature=round(state.value, 1),
-                            function_class=state.functionClass,
-                            function_instance=state.functionInstance,
-                        )
+                    climate_data["current_temperature"] = features.CurrentTemperatureFeature(
+                        temperature=round(state.value, 1),
+                        function_class=state.functionClass,
+                        function_instance=state.functionInstance,
                     )
                 else:
                     capability_def = device.get_capability_from_device(
@@ -85,9 +80,7 @@ class ClimateController(BaseResourcesController[AferoResourceT]):
                         state.functionInstance,
                     )
                     if capability_def:
-                        target_data = generate_target_temp_capability(
-                            capability_def, state
-                        )
+                        target_data = generate_target_temp_capability(capability_def, state)
                     else:
                         # @TODO - This exists as we do not have data dumps with capabilities
                         # for all devices. We should remove this fallback once we do
@@ -98,9 +91,7 @@ class ClimateController(BaseResourcesController[AferoResourceT]):
                         )
                         target_data = generate_target_temp(func_def["values"][0], state)
                     if state.functionInstance in TARGET_INSTANCE_MAPPING:
-                        climate_data[
-                            TARGET_INSTANCE_MAPPING[state.functionInstance]
-                        ] = target_data
+                        climate_data[TARGET_INSTANCE_MAPPING[state.functionInstance]] = target_data
                     else:
                         self._logger.warning("Found unknown temp instance, %s", state)
             elif state.functionClass == "mode":

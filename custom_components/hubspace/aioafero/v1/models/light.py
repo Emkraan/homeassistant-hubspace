@@ -1,10 +1,9 @@
 """Representation of an Afero Light and its corresponding updates."""
 
-from dataclasses import dataclass, field
 import re
+from dataclasses import dataclass, field
 
 from . import features
-
 from .resource import ResourceTypes
 from .standard_mixin import StandardMixin
 

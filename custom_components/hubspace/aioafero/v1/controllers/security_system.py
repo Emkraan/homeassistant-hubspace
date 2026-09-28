@@ -13,7 +13,6 @@ from ...errors import DeviceNotFound, SecuritySystemError
 from ...util import process_function
 from ..models import SecuritySystem, SecuritySystemPut, features
 from ..models.resource import DeviceInformation, ResourceTypes
-
 from .base import AferoBinarySensor, AferoSensor, BaseResourcesController, NumbersName
 from .event import CallbackResponse
 
@@ -59,10 +58,7 @@ def get_valid_states(afero_states: list, sensor_id: int) -> list:
     """Find states associated with the specific sensor."""
     valid_states: list = []
     for state in afero_states:
-        if (
-            state.functionClass not in ["sensor-state", "sensor-config"]
-            or state.value is None
-        ):
+        if state.functionClass not in ["sensor-state", "sensor-config"] or state.value is None:
             continue
         state_sensor_split = state.functionInstance.rsplit("-", 1)
         state_sensor_id = int(state_sensor_split[1])
@@ -140,9 +136,7 @@ def get_model_type(states: list[AferoState], sensor_id: int) -> str:
         if state_sensor_id != sensor_id:
             continue
         top_level_key = list(state.value.keys())[0]
-        return KNOWN_SENSOR_MODELS.get(
-            int(state.value[top_level_key]["deviceType"]), "Unknown"
-        )
+        return KNOWN_SENSOR_MODELS.get(int(state.value[top_level_key]["deviceType"]), "Unknown")
     return "Unknown"
 
 
@@ -210,7 +204,9 @@ def security_system_callback(afero_device: AferoDevice) -> CallbackResponse:
             cloned.friendly_name = f"{afero_device.friendly_name} - {get_sensor_name(afero_device.capabilities, sensor_id)}"
             cloned.states = get_valid_states(afero_device.states, sensor_id)
             cloned.functions = get_valid_functions(afero_device.functions, sensor_id)
-            cloned.model = f"{afero_device.model} - {get_model_type(afero_device.states, sensor_id)}"
+            cloned.model = (
+                f"{afero_device.model} - {get_model_type(afero_device.states, sensor_id)}"
+            )
             multi_devs.append(cloned)
     return CallbackResponse(
         split_devices=multi_devs,
@@ -237,21 +233,13 @@ class SecuritySystemController(BaseResourcesController[SecuritySystem]):
     }
     # Elements that map to numbers. func class / func instance to NumbersName
     ITEM_NUMBERS: dict[tuple[str, str | None], NumbersName] = {
-        ("arm-exit-delay", "away"): NumbersName(
-            unit="seconds", display_name="Arm Exit Delay Away"
-        ),
-        ("arm-exit-delay", "stay"): NumbersName(
-            unit="seconds", display_name="Arm Exit Delay Home"
-        ),
-        ("temporary-bypass-time", None): NumbersName(
-            unit="seconds", display_name="Bypass Time"
-        ),
+        ("arm-exit-delay", "away"): NumbersName(unit="seconds", display_name="Arm Exit Delay Away"),
+        ("arm-exit-delay", "stay"): NumbersName(unit="seconds", display_name="Arm Exit Delay Home"),
+        ("temporary-bypass-time", None): NumbersName(unit="seconds", display_name="Bypass Time"),
         ("disarm-entry-delay", None): NumbersName(
             unit="seconds", display_name="Disarm Entry Delay"
         ),
-        ("siren-alarm-timeout", None): NumbersName(
-            unit="seconds", display_name="Siren Timeout"
-        ),
+        ("siren-alarm-timeout", None): NumbersName(unit="seconds", display_name="Siren Timeout"),
     }
     # Elements that map to Select. func class / func instance to name
     ITEM_SELECTS = {
@@ -331,9 +319,7 @@ class SecuritySystemController(BaseResourcesController[SecuritySystem]):
             elif state.functionClass == "alarm-state":
                 alarm_state = features.ModeFeature(
                     mode=state.value,
-                    modes=set(
-                        process_function(afero_device.functions, state.functionClass)
-                    ),
+                    modes=set(process_function(afero_device.functions, state.functionClass)),
                 )
             elif sensor := await self.initialize_sensor(state, afero_device.device_id):
                 if isinstance(sensor, AferoBinarySensor):
@@ -477,9 +463,7 @@ class SecuritySystemController(BaseResourcesController[SecuritySystem]):
                     selects=cur_item.selects[key].selects,
                     name=cur_item.selects[key].name,
                 )
-        await self.update(
-            device_id, obj_in=update_obj, send_duplicate_states=force_mode
-        )
+        await self.update(device_id, obj_in=update_obj, send_duplicate_states=force_mode)
         # Ensure the correct pin was used
         if disarm_pin:
             await self.validate_disarm_pin(device_id)
@@ -541,24 +525,16 @@ class SecuritySystemController(BaseResourcesController[SecuritySystem]):
                 self._logger.debug("Bypassing sensor %s", sensor.id)
                 continue
             if sensor.available is False:
-                sensors_with_issues.append(
-                    f"{sensor.device_information.name} (Unavailable)"
-                )
+                sensors_with_issues.append(f"{sensor.device_information.name} (Unavailable)")
             if sensor.binary_sensors.get("triggered|None").current_value == "On":
-                sensors_with_issues.append(
-                    f"{sensor.device_information.name} (Triggered)"
-                )
+                sensors_with_issues.append(f"{sensor.device_information.name} (Triggered)")
             if sensor.binary_sensors.get("tampered|None").current_value == "On":
-                sensors_with_issues.append(
-                    f"{sensor.device_information.name} (Tampered)"
-                )
+                sensors_with_issues.append(f"{sensor.device_information.name} (Tampered)")
             num_sensors += 1
         if sensors_with_issues:
             raise SecuritySystemError(
                 f"Sensors are open or unavailable: {', '.join(sensors_with_issues)}"
             )
         if num_sensors == 0:
-            raise SecuritySystemError(
-                "No sensors are configured for the requested mode."
-            )
+            raise SecuritySystemError("No sensors are configured for the requested mode.")
         return True

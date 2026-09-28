@@ -7,7 +7,6 @@ from typing import Any
 
 import aiohttp
 import voluptuous as vol
-
 from homeassistant.config_entries import (
     ConfigEntry,
     ConfigFlow,
@@ -64,9 +63,7 @@ class HubspaceConfigFlow(ConfigFlow, domain=DOMAIN):
         self._otp_required: bool = False
         self._reauth_entry: ConfigEntry | None = None
 
-    async def async_step_user(
-        self, user_input: dict[str, Any] | None = None
-    ) -> ConfigFlowResult:
+    async def async_step_user(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Collect Hubspace account credentials."""
         errors: dict[str, str] = {}
         if user_input is not None:
@@ -98,9 +95,7 @@ class HubspaceConfigFlow(ConfigFlow, domain=DOMAIN):
             ),
         )
 
-    async def async_step_otp(
-        self, user_input: dict[str, Any] | None = None
-    ) -> ConfigFlowResult:
+    async def async_step_otp(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Collect a one-time-passcode when the account has MFA enabled."""
         errors: dict[str, str] = {}
         if user_input is not None:
@@ -189,9 +184,7 @@ class HubspaceConfigFlow(ConfigFlow, domain=DOMAIN):
 class HubspaceOptionsFlow(OptionsFlow):
     """Options for polling interval and stale-data tolerance."""
 
-    async def async_step_init(
-        self, user_input: dict[str, Any] | None = None
-    ) -> ConfigFlowResult:
+    async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Manage the options."""
         if user_input is not None:
             return self.async_create_entry(data=user_input)
@@ -203,9 +196,7 @@ class HubspaceOptionsFlow(OptionsFlow):
                 {
                     vol.Required(
                         CONF_POLLING_INTERVAL,
-                        default=options.get(
-                            CONF_POLLING_INTERVAL, DEFAULT_POLLING_INTERVAL
-                        ),
+                        default=options.get(CONF_POLLING_INTERVAL, DEFAULT_POLLING_INTERVAL),
                     ): NumberSelector(
                         NumberSelectorConfig(
                             min=MIN_POLLING_INTERVAL,
@@ -216,9 +207,7 @@ class HubspaceOptionsFlow(OptionsFlow):
                     ),
                     vol.Required(
                         CONF_DISCOVERY_INTERVAL,
-                        default=options.get(
-                            CONF_DISCOVERY_INTERVAL, DEFAULT_DISCOVERY_INTERVAL
-                        ),
+                        default=options.get(CONF_DISCOVERY_INTERVAL, DEFAULT_DISCOVERY_INTERVAL),
                     ): NumberSelector(
                         NumberSelectorConfig(
                             min=300,
@@ -229,15 +218,11 @@ class HubspaceOptionsFlow(OptionsFlow):
                     ),
                     vol.Required(
                         CONF_TOLERATE_STALE_DATA,
-                        default=options.get(
-                            CONF_TOLERATE_STALE_DATA, DEFAULT_TOLERATE_STALE_DATA
-                        ),
+                        default=options.get(CONF_TOLERATE_STALE_DATA, DEFAULT_TOLERATE_STALE_DATA),
                     ): BooleanSelector(),
                     vol.Required(
                         CONF_STALE_GRACE_MINUTES,
-                        default=options.get(
-                            CONF_STALE_GRACE_MINUTES, DEFAULT_STALE_GRACE_MINUTES
-                        ),
+                        default=options.get(CONF_STALE_GRACE_MINUTES, DEFAULT_STALE_GRACE_MINUTES),
                     ): NumberSelector(
                         NumberSelectorConfig(
                             min=1,

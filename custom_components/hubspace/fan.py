@@ -30,9 +30,7 @@ async def async_setup_entry(
 ) -> None:
     """Set up Hubspace fans from a config entry."""
     coordinator: HubspaceCoordinator = entry.runtime_data
-    async_add_entities(
-        HubspaceFan(coordinator, item.id) for item in coordinator.bridge.fans.items
-    )
+    async_add_entities(HubspaceFan(coordinator, item.id) for item in coordinator.bridge.fans.items)
 
 
 class HubspaceFan(HubspaceEntity, FanEntity):
@@ -130,6 +128,4 @@ class HubspaceFan(HubspaceEntity, FanEntity):
 
     async def async_set_direction(self, direction: str) -> None:
         """Set the fan rotation direction."""
-        await self.coordinator.bridge.fans.set_direction(
-            self.device_id, direction == "forward"
-        )
+        await self.coordinator.bridge.fans.set_direction(self.device_id, direction == "forward")

@@ -21,10 +21,10 @@ __all__ = [
 ]
 
 import asyncio
-from collections.abc import Callable, Generator
 import contextlib
-from contextlib import asynccontextmanager
 import logging
+from collections.abc import Callable, Generator
+from contextlib import asynccontextmanager
 from typing import Any
 
 import aiohttp
@@ -39,7 +39,6 @@ from ..errors import (
     InvalidAuth,
 )
 from ..types import TemperatureUnit
-
 from . import models, v1_const
 from .auth import AferoAuth, TokenData, passthrough
 from .controllers.base import AferoBinarySensor, AferoSensor, BaseResourcesController
@@ -194,11 +193,7 @@ class AferoBridgeV1:
     @property
     def controllers(self) -> list:
         """Get a list of initialized controllers."""
-        return [
-            controller
-            for controller in self._controllers.values()
-            if controller.initialized
-        ]
+        return [controller for controller in self._controllers.values() if controller.initialized]
 
     @property
     def controllers_by_name(self) -> dict[str, "BaseResourcesController"]:
@@ -362,9 +357,7 @@ class AferoBridgeV1:
             Callable that removes this subscription from every controller.
 
         """
-        unsubscribes = [
-            controller.subscribe(callback) for controller in self.controllers
-        ]
+        unsubscribes = [controller.subscribe(callback) for controller in self.controllers]
 
         def unsubscribe():
             for unsub in unsubscribes:
@@ -397,9 +390,7 @@ class AferoBridgeV1:
             json_data = await res.json()
             if len(json_data) == 0 or len(json_data.get("accountAccess", [])) == 0:
                 raise AferoError("No account ID found")
-            self._account_id = (
-                json_data.get("accountAccess")[0].get("account").get("accountId")
-            )
+            self._account_id = json_data.get("accountAccess")[0].get("account").get("accountId")
             add_secret(self._account_id)
         return self._account_id
 
@@ -491,12 +482,8 @@ class AferoBridgeV1:
     async def _fetch_all_device_states(self) -> list[AferoDevice]:
         """Query the API for all known device states."""
         # Split entities share a parent metadevice; poll each parent once.
-        metadevice_ids = {
-            self.resolve_metadevice_id(device_id) for device_id in self._known_devs
-        }
-        tasks = [
-            self._fetch_device_states(metadevice_id) for metadevice_id in metadevice_ids
-        ]
+        metadevice_ids = {self.resolve_metadevice_id(device_id) for device_id in self._known_devs}
+        tasks = [self._fetch_device_states(metadevice_id) for metadevice_id in metadevice_ids]
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
         updated_devices: list[AferoDevice] = []
@@ -524,9 +511,7 @@ class AferoBridgeV1:
         if self.temperature_unit == TemperatureUnit.FAHRENHEIT:
             params["units"] = self.temperature_unit.value
         url = self.generate_api_url(
-            v1_const.AFERO_GENERICS["API_DEVICE_STATE_ENDPOINT"].format(
-                self.account_id, device_id
-            )
+            v1_const.AFERO_GENERICS["API_DEVICE_STATE_ENDPOINT"].format(self.account_id, device_id)
         )
         res = await self.request(
             "get",
@@ -562,7 +547,7 @@ class AferoBridgeV1:
     @asynccontextmanager
     async def create_request(
         self, method: str, url: str, include_token: bool, **kwargs
-    ) -> Generator[aiohttp.ClientResponse, None, None]:
+    ) -> Generator[aiohttp.ClientResponse]:
         """Create and manage an `aiohttp` request.
 
         This is an async context manager that handles session creation and
@@ -620,9 +605,7 @@ class AferoBridgeV1:
             # (matches reported "Connection timeouts when fetching states").
             # Fold it into the same retry loop instead of a separate path.
             try:
-                async with self.create_request(
-                    method, url, include_token, **kwargs
-                ) as resp:
+                async with self.create_request(method, url, include_token, **kwargs) as resp:
                     # 500/502 added: Afero's own API intermittently 500s
                     # under load (reported directly against this endpoint);
                     # treat it the same as the already-handled 503/504/429.

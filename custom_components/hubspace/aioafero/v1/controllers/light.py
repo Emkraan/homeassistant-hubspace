@@ -1,8 +1,8 @@
 """Controller holding and managing Hubspace resources of type `light`."""
 
-from contextlib import suppress
 import copy
 import logging
+from contextlib import suppress
 
 from ... import device, errors
 from ...device import AferoDevice, AferoState
@@ -10,7 +10,6 @@ from ...util import process_range
 from ..models import features
 from ..models.light import Light, LightPut
 from ..models.resource import DeviceInformation, ResourceTypes
-
 from .base import AferoBinarySensor, AferoSensor, BaseResourcesController, NumbersName
 from .event import CallbackResponse
 
@@ -194,9 +193,7 @@ class LightController(BaseResourcesController[Light]):
         ("speed", "color-sequence"): NumbersName(unit="speed"),
     }
     # Split Lights from the primary payload
-    DEVICE_SPLIT_CALLBACKS: dict[str, callable] = {
-        ResourceTypes.LIGHT.value: light_callback
-    }
+    DEVICE_SPLIT_CALLBACKS: dict[str, callable] = {ResourceTypes.LIGHT.value: light_callback}
 
     async def turn_on(self, device_id: str) -> None:
         """Turn on the light.
@@ -230,9 +227,7 @@ class LightController(BaseResourcesController[Light]):
             self._logger.info("Unable to find device %s", device_id)
             return
         if cur_item.color_temperature is not None:
-            await self.set_state(
-                device_id, on=True, temperature=temperature, color_mode="white"
-            )
+            await self.set_state(device_id, on=True, temperature=temperature, color_mode="white")
         elif cur_item.supports_color_white:
             self._logger.info(
                 "Device %s has no color-temperature function; ignoring %d K",
@@ -260,9 +255,7 @@ class LightController(BaseResourcesController[Light]):
             brightness: Brightness percentage when ``on`` is ``True``.
 
         """
-        await self.set_state(
-            device_id, on=on, color_mode="white", brightness=brightness
-        )
+        await self.set_state(device_id, on=on, color_mode="white", brightness=brightness)
 
     async def set_brightness(self, device_id: str, brightness: int) -> None:
         """Set brightness, turning the light on if needed.
@@ -284,9 +277,7 @@ class LightController(BaseResourcesController[Light]):
             blue: Blue channel ``0``–``255``.
 
         """
-        await self.set_state(
-            device_id, on=True, color=(red, green, blue), color_mode="color"
-        )
+        await self.set_state(device_id, on=True, color=(red, green, blue), color_mode="color")
 
     async def set_effect(self, device_id: str, effect: str) -> None:
         """Set a color sequence effect, turning the light on if needed.
@@ -458,9 +449,7 @@ class LightController(BaseResourcesController[Light]):
                 updated_keys.add(update_key)
 
         # Several states hold the effect, but its always derived from the preset functionInstance
-        return updated_keys.union(
-            await self.update_elem_color(cur_item, color_seq_states)
-        )
+        return updated_keys.union(await self.update_elem_color(cur_item, color_seq_states))
 
     async def update_elem_color(self, cur_item: Light, color_seq_states: dict) -> set:
         """Perform the update for effects."""
@@ -533,12 +522,7 @@ class LightController(BaseResourcesController[Light]):
         )
         if no_brightness:
             brightness = None
-        if (
-            on is True
-            and not cur_item.is_on
-            and no_brightness
-            and cur_item.color_mode is not None
-        ):
+        if on is True and not cur_item.is_on and no_brightness and cur_item.color_mode is not None:
             mode_res = await self.update(
                 device_id,
                 obj_in=LightPut(color_mode=features.ColorModeFeature(mode=color_mode)),
@@ -546,8 +530,7 @@ class LightController(BaseResourcesController[Light]):
             )
             if not mode_res:
                 self._logger.warning(
-                    "Failed to select color-mode %s before power-on for %s; "
-                    "aborting turn-on",
+                    "Failed to select color-mode %s before power-on for %s; aborting turn-on",
                     color_mode,
                     device_id,
                 )
@@ -616,9 +599,7 @@ class LightController(BaseResourcesController[Light]):
                 update_obj.effect = features.EffectFeature(
                     effect=effect, effects=cur_item.effect.effects
                 )
-        await self.update(
-            device_id, obj_in=update_obj, send_duplicate_states=send_duplicate_states
-        )
+        await self.update(device_id, obj_in=update_obj, send_duplicate_states=send_duplicate_states)
 
 
 def process_color_temps(color_temps: dict) -> list[int]:
@@ -640,9 +621,7 @@ def process_effects(functions: list[dict]) -> dict[str, set]:
     supported_effects = {}
     for function in functions:
         if function["functionClass"] == "color-sequence":
-            supported_effects[function["functionInstance"]] = set(
-                process_names(function["values"])
-            )
+            supported_effects[function["functionInstance"]] = set(process_names(function["values"]))
     # custom shouldn't be a value in preset
     with suppress(KeyError):
         supported_effects["preset"].remove("custom")

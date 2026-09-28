@@ -4,7 +4,6 @@ from ...device import AferoDevice
 from ...errors import DeviceNotFound
 from ..models import SecuritySystemKeypad, SecuritySystemKeypadPut, features
 from ..models.resource import DeviceInformation, ResourceTypes
-
 from .base import AferoBinarySensor, BaseResourcesController
 
 

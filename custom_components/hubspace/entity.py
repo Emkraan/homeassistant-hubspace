@@ -33,9 +33,7 @@ class HubspaceEntity(CoordinatorEntity[HubspaceCoordinator]):
         super().__init__(coordinator)
         self._controller_attr = controller_attr
         self.device_id = device_id
-        self._attr_unique_id = (
-            f"{device_id}_{unique_suffix}" if unique_suffix else device_id
-        )
+        self._attr_unique_id = f"{device_id}_{unique_suffix}" if unique_suffix else device_id
         info = self.resource.device_information
         device_info = DeviceInfo(
             identifiers={(DOMAIN, device_id)},

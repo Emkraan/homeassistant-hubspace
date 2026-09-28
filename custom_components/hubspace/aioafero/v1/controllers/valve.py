@@ -5,7 +5,6 @@ from ...device import AferoDevice
 from ..models import features
 from ..models.resource import DeviceInformation, ResourceTypes
 from ..models.valve import Valve, ValvePut
-
 from .base import AferoBinarySensor, AferoSensor, BaseResourcesController
 
 

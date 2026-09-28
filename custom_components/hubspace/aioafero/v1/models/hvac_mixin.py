@@ -40,9 +40,7 @@ class HVACMixin(ABC):
     def get_mode_to_check(self) -> str | None:
         """Determine the current mode of the thermostat."""
 
-    def _get_target_feature(
-        self, mode: str
-    ) -> features.TargetTemperatureFeature | None:
+    def _get_target_feature(self, mode: str) -> features.TargetTemperatureFeature | None:
         if mode == "cool":
             return getattr(self, "target_temperature_cooling", None)
         if mode == "heat":

@@ -7,7 +7,6 @@ from ...errors import DeviceNotFound
 from ..models import features
 from ..models.portable_ac import PortableAC, PortableACPut
 from ..models.resource import DeviceInformation, ResourceTypes
-
 from .climate import ClimateController
 from .event import CallbackResponse
 
@@ -21,11 +20,7 @@ def generate_split_name(afero_device: AferoDevice, instance: str) -> str:
 
 def get_valid_states(afero_dev: AferoDevice) -> list:
     """Find states associated with the element."""
-    return [
-        state
-        for state in afero_dev.states
-        if state.functionClass in ["available", "power"]
-    ]
+    return [state for state in afero_dev.states if state.functionClass in ["available", "power"]]
 
 
 def portable_ac_callback(afero_device: AferoDevice) -> CallbackResponse:

@@ -163,14 +163,10 @@ class HubspaceLight(HubspaceEntity, LightEntity):
         await controller.set_state(
             self.device_id,
             on=True,
-            brightness=(
-                round(brightness * 100 / 255) if brightness is not None else None
-            ),
+            brightness=(round(brightness * 100 / 255) if brightness is not None else None),
             color=kwargs.get("rgb_color"),
             color_mode=(
-                "color"
-                if "rgb_color" in kwargs
-                else "sequence" if "effect" in kwargs else None
+                "color" if "rgb_color" in kwargs else "sequence" if "effect" in kwargs else None
             ),
             temperature=kwargs.get("color_temp_kelvin"),
             effect=kwargs.get("effect"),

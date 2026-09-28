@@ -31,9 +31,7 @@ class StandardMixin:
         """Configure the available instances."""
         instances = {}
         for function in self.device_information.functions or []:
-            instances[function["functionClass"]] = function.get(
-                "functionInstance", None
-            )
+            instances[function["functionClass"]] = function.get("functionInstance", None)
         self.instances = instances
 
     def get_instance(self, elem):

@@ -4,7 +4,6 @@ from ...device import AferoDevice
 from ...errors import DeviceNotFound
 from ..models import SecuritySystemSensor, SecuritySystemSensorPut, features
 from ..models.resource import DeviceInformation, ResourceTypes
-
 from .base import AferoBinarySensor, AferoSensor, BaseResourcesController
 from .security_system import (
     BYPASS_MODES,
@@ -131,15 +130,9 @@ class SecuritySystemSensorController(BaseResourcesController[SecuritySystemSenso
             bypass_types = {y: x for x, y in BYPASS_MODES.items()}
             # Load the current values as it all needs to be sent
             select_vals = {
-                "chirpMode": chirp_modes[
-                    cur_item.selects.get(("chirpMode", None)).selected
-                ],
-                "triggerType": trigger_types[
-                    cur_item.selects.get(("triggerType", None)).selected
-                ],
-                "bypassType": bypass_types[
-                    cur_item.selects.get(("bypassType", None)).selected
-                ],
+                "chirpMode": chirp_modes[cur_item.selects.get(("chirpMode", None)).selected],
+                "triggerType": trigger_types[cur_item.selects.get(("triggerType", None)).selected],
+                "bypassType": bypass_types[cur_item.selects.get(("bypassType", None)).selected],
             }
             for select, select_val in selects.items():
                 if select[0] == "chirpMode":

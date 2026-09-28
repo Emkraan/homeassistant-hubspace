@@ -13,8 +13,8 @@ a single Afero event-stream subscription that calls ``async_set_updated_data``
 from __future__ import annotations
 
 import asyncio
-from datetime import datetime, timedelta
 import logging
+from datetime import datetime, timedelta
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
@@ -79,9 +79,7 @@ class HubspaceCoordinator(DataUpdateCoordinator[None]):
             CONF_TOLERATE_STALE_DATA, DEFAULT_TOLERATE_STALE_DATA
         )
         self.stale_grace = timedelta(
-            minutes=entry.options.get(
-                CONF_STALE_GRACE_MINUTES, DEFAULT_STALE_GRACE_MINUTES
-            )
+            minutes=entry.options.get(CONF_STALE_GRACE_MINUTES, DEFAULT_STALE_GRACE_MINUTES)
         )
         self._last_seen: dict[str, datetime] = {}
         self._deleted_ids: set[str] = set()
@@ -94,9 +92,7 @@ class HubspaceCoordinator(DataUpdateCoordinator[None]):
 
     async def _async_setup(self) -> None:
         """Start the bridge and wait for its first poll. Called once by HA."""
-        self._unsub_bridge_events = self.bridge.events.subscribe(
-            self._handle_bridge_event
-        )
+        self._unsub_bridge_events = self.bridge.events.subscribe(self._handle_bridge_event)
         self._unsub_stale_watchdog = async_track_time_interval(
             self.hass,
             self._async_check_stale_devices,
@@ -108,13 +104,9 @@ class HubspaceCoordinator(DataUpdateCoordinator[None]):
                 self.bridge.events.wait_for_first_poll(), timeout=FIRST_POLL_TIMEOUT
             )
         except InvalidAuth as err:
-            raise ConfigEntryAuthFailed(
-                "Hubspace credentials are no longer valid"
-            ) from err
+            raise ConfigEntryAuthFailed("Hubspace credentials are no longer valid") from err
         except TimeoutError as err:
-            raise ConfigEntryNotReady(
-                "Timed out waiting for the initial Hubspace poll"
-            ) from err
+            raise ConfigEntryNotReady("Timed out waiting for the initial Hubspace poll") from err
         if not self.bridge.events.connected:
             raise ConfigEntryNotReady("Could not connect to the Hubspace cloud")
 
@@ -174,8 +166,7 @@ class HubspaceCoordinator(DataUpdateCoordinator[None]):
         stale_ids = [
             device_id
             for device_id in self._last_seen
-            if device_id not in self._deleted_ids
-            and not self.device_available(device_id)
+            if device_id not in self._deleted_ids and not self.device_available(device_id)
         ]
         self._stale_since = {
             device_id: self._stale_since.get(device_id, now) for device_id in stale_ids
@@ -184,9 +175,7 @@ class HubspaceCoordinator(DataUpdateCoordinator[None]):
             return
 
         oldest_stale = min(self._stale_since.values())
-        if now - oldest_stale >= timedelta(
-            minutes=STALE_DEVICE_RELOAD_THRESHOLD_MINUTES
-        ):
+        if now - oldest_stale >= timedelta(minutes=STALE_DEVICE_RELOAD_THRESHOLD_MINUTES):
             _LOGGER.warning(
                 "%d device(s) still unresponsive after %d minutes despite "
                 "discovery refreshes; reloading the integration to force a "
@@ -194,9 +183,7 @@ class HubspaceCoordinator(DataUpdateCoordinator[None]):
                 len(stale_ids),
                 STALE_DEVICE_RELOAD_THRESHOLD_MINUTES,
             )
-            self.hass.async_create_task(
-                self.hass.config_entries.async_reload(self._entry.entry_id)
-            )
+            self.hass.async_create_task(self.hass.config_entries.async_reload(self._entry.entry_id))
             return
 
         if self._last_discovery_recovery is not None and now - (

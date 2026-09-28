@@ -52,12 +52,10 @@ async def async_setup_entry(
     """Set up Hubspace climate entities from a config entry."""
     coordinator: HubspaceCoordinator = entry.runtime_data
     entities: list[ClimateEntity] = [
-        HubspaceThermostat(coordinator, item.id)
-        for item in coordinator.bridge.thermostats.items
+        HubspaceThermostat(coordinator, item.id) for item in coordinator.bridge.thermostats.items
     ]
     entities.extend(
-        HubspacePortableAC(coordinator, item.id)
-        for item in coordinator.bridge.portable_acs.items
+        HubspacePortableAC(coordinator, item.id) for item in coordinator.bridge.portable_acs.items
     )
     async_add_entities(entities)
 
@@ -175,9 +173,7 @@ class HubspaceThermostat(_HubspaceClimateBase):
         """Set the HVAC mode."""
         afero_mode = HVAC_MODE_TO_AFERO.get(hvac_mode)
         if afero_mode is not None:
-            await self.coordinator.bridge.thermostats.set_hvac_mode(
-                self.device_id, afero_mode
-            )
+            await self.coordinator.bridge.thermostats.set_hvac_mode(self.device_id, afero_mode)
 
     async def async_set_fan_mode(self, fan_mode: str) -> None:
         """Set the fan mode."""
@@ -187,9 +183,7 @@ class HubspaceThermostat(_HubspaceClimateBase):
         """Set a new target temperature (single setpoint or heat/cool range)."""
         controller = self.coordinator.bridge.thermostats
         if ATTR_TEMPERATURE in kwargs:
-            await controller.set_target_temperature(
-                self.device_id, kwargs[ATTR_TEMPERATURE]
-            )
+            await controller.set_target_temperature(self.device_id, kwargs[ATTR_TEMPERATURE])
             return
         low = kwargs.get("target_temp_low")
         high = kwargs.get("target_temp_high")
