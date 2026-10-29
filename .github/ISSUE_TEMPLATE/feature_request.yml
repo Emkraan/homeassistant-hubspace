@@ -1,7 +1,7 @@
 name: Feature request
 description: Suggest a new entity, device type, or capability.
 title: "[Feature]: "
-labels: ["enhancement", "triage"]
+labels: ["type:enhancement", "triage"]
 body:
   - type: markdown
     attributes:
