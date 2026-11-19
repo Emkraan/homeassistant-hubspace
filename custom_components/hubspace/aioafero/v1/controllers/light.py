@@ -573,9 +573,8 @@ class LightController(BaseResourcesController[Light]):
                 )
                 if color_mode is None:
                     color_mode = "white"
-            elif temperature is not None and cur_item.supports_color_white:
-                if color_mode is None:
-                    color_mode = "white"
+            elif temperature is not None and cur_item.supports_color_white and color_mode is None:
+                color_mode = "white"
             if brightness is not None and cur_item.dimming is not None:
                 update_obj.dimming = features.DimmingFeature(
                     brightness=brightness, supported=cur_item.dimming.supported
