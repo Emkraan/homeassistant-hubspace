@@ -169,10 +169,9 @@ class FanController(BaseResourcesController[Fan]):
                 if cur_item.preset.enabled != new_val:
                     cur_item.preset.enabled = new_val
                     updated_keys.add("preset")
-            elif state.functionClass == "available":
-                if cur_item.available != state.value:
-                    cur_item.available = state.value
-                    updated_keys.add("available")
+            elif state.functionClass == "available" and cur_item.available != state.value:
+                cur_item.available = state.value
+                updated_keys.add("available")
 
         return updated_keys
 

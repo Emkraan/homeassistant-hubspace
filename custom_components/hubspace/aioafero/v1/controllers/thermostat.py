@@ -111,10 +111,12 @@ class ThermostatController(ClimateController[Thermostat]):
                 if cur_item.fan_mode.mode != state.value:
                     cur_item.fan_mode.mode = state.value
                     updated_keys.add("fan-mode")
-            elif state.functionClass == "current-system-state":
-                if cur_item.hvac_action != state.value:
-                    cur_item.hvac_action = state.value
-                    updated_keys.add(state.functionClass)
+            elif (
+                state.functionClass == "current-system-state"
+                and cur_item.hvac_action != state.value
+            ):
+                cur_item.hvac_action = state.value
+                updated_keys.add(state.functionClass)
         return updated_keys
 
     async def set_fan_mode(self, device_id: str, fan_mode: str) -> None:
